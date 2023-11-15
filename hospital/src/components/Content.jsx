@@ -1,15 +1,15 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from './Home'
-import LoginPage from './Login'
+import LoginPage from './LoginPage'
 
 
 const Content = () => {
   return (
     <BrowserRouter>
     <Routes>
-      <Route path="/" element={<Home />}></Route>
-      <Route path="/Product" element={<LoginPage  />}></Route>
+      <Route path="/" element={<LoginPage />}></Route>
+      <Route path="/Home" element={<Home  />}></Route>
      
     </Routes>
   </BrowserRouter>

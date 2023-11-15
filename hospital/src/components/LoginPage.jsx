@@ -62,7 +62,7 @@ const LoginPage = () => {
 
   const handleLogin = () => {
     if (username === "admin" && password === "123456") {
-      window.location = "/";
+      window.location = "/Home";
     } else {
       setError("Username or Password is wrong");
     }

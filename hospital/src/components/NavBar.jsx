@@ -8,13 +8,14 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 
 
-import DraftsIcon from "@mui/icons-material/Drafts";
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
 import HomeIcon from '@mui/icons-material/Home';
 import {
   Link as RouterLink,
-  useLocation,
+  
 } from "react-router-dom";
+import { Divider } from "@mui/material";
 
 
 
@@ -50,10 +51,12 @@ ListItemLink.propTypes = {
 export default function NavBar() {
   return (
     <Box sx={{ width: 360}}>
-      <Paper elevation={0} style={{height:"700px",backgroundColor:"transparent"}}>
+      <Paper elevation={0} style={{height:"700px",background: 'var(--m-3-sys-light-surface-container-low, #FEF1EE)',display:"flex",flexDirection:"column",gap:"20px",paddingTop:"20px"}}>
+        <h2 style={{marginBottom:"10px"}}>HOSPITAL MANAGEMNET</h2>
+        <Divider/>
         <List aria-label="main mailbox folders">
           <ListItemLink to="/Home" primary="Home" icon={<HomeIcon/>} />
-          <ListItemLink to="/drafts" primary="Drafts" icon={<DraftsIcon />} />
+          <ListItemLink to="/Record" primary="Record" icon={<ListAltIcon />} />
         </List>
       </Paper>
     </Box>
