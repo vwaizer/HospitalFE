@@ -13,7 +13,7 @@ const FormBlock=styled.div`
     flex-direction:column;
     background:var(--m-3-sys-light-surface, #FFF8F6);
     width:500px;
-    padding:10px;
+    padding:15px;
     border-radius:10px;
    
 
