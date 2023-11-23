@@ -75,11 +75,12 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
     if (username === "admin" && password === "123456") {
-      window.location = "/SearchPage";
+      window.location = "/Home";
+
     } else {
       setError("Username or Password is wrong");
     }

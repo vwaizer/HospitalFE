@@ -9,7 +9,15 @@ import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {Link} from 'react-router-dom';
-
+import { 
+    Typography,
+    Container, 
+    Box, 
+    Stack,
+    TextField,
+    Button,
+  } from "@mui/material";
+import Detail from './Detail';
 function createData(id, lName, fName, phoneNumeber, doctorTreat) {
   return { id, lName, fName, phoneNumeber, doctorTreat };
 }
@@ -24,7 +32,14 @@ const rows = [
   createData(5, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B')
 ];
 
-export default function TableContent() {
+export default function TableContentInReport() {
+    const [showDetail,setShowDetail]=useState(false);
+    const [detailID,setDetailID]=useState(0);  
+    const onClickFunc=(id)=>{
+        
+        setShowDetail(!showDetail);
+        setDetailID(id);
+    }
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
@@ -40,6 +55,7 @@ export default function TableContent() {
   }
   
   return (
+    <>
     <TableContainer component={Paper} style={{background: 'var(--m-3-sys-light-surface, #FFF8F6)'}}>
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -70,14 +86,16 @@ export default function TableContent() {
               <TableCell align="right">{row.phoneNumeber}</TableCell>
               <TableCell align="right">{row.doctorTreat}</TableCell>
               <TableCell align="center" sx={{width: 24, height: 24}}>
-              <Link to="/Home/Report"> 
+              {/* <Link to="/Report"> 
                 <ArrowRightIcon/>
-              </Link>
+              </Link> */}
+              <Button variant="contained" onClick={()=>onClickFunc(row.id)} style={{ backgroundColor: "var(--m-3-sys-light-surface-container-high, #F3E5E3)", color: "red" }}>Show detail</Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
       <TablePagination
         rowsPerPageOptions={[0, 25, 100]}
         component="div"
@@ -87,7 +105,11 @@ export default function TableContent() {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+       
+        
     </TableContainer>
-
+    {showDetail && <Detail data = {rows[detailID]}/>}
+    </>
+    
   );
 }

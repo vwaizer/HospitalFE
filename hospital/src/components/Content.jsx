@@ -5,15 +5,15 @@ import LoginPage from '../Pages/Login/LoginPage'
 import Root from './Root'
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './Theme';
-
+import Report from '../Pages/SearchPage/Report';
 const router = createBrowserRouter(
   createRoutesFromElements(
   <Route>
-    <Route path="/Login" element={<LoginPage />}/>
-  <Route path='/' element={<Root/>}>
+    <Route path="/" element={<LoginPage />}/>
+  <Route path='/Home' element={<Root/>}>
     <Route index element={<SearchPage/>}/>
-    <Route path="/SearchPage" element={<SearchPage  />}></Route>
-    {/* <Route path="/Report" element={<Report  />}></Route> */}
+    <Route path="/Home/SearchPage" element={<SearchPage/>}></Route>
+    <Route path="/Home/Report" element={<Report/>}></Route>
   </Route>
   </Route>
   )

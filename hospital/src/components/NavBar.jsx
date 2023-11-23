@@ -90,8 +90,8 @@ function ResponsiveDrawer(props) {
       </Toolbar>
       <Divider />
       <List sx={{display: 'flex', flexDirection:'column',flexGrow: '1'}}>
-        <ListItemLink text="SearchPage" icon={<SearchIcon />} to="/SearchPage" />
-        <ListItemLink text="Report" icon={<DescriptionIcon />} to="/Report" />
+        <ListItemLink text="SearchPage" icon={<SearchIcon />} to="/Home/SearchPage" />
+        <ListItemLink text="Report" icon={<DescriptionIcon />} to="/Home/Report" />
       </List>
         <ListItemLogOut text="Log Out" icon={<LogoutIcon />} to={"/Logout"}/>
     </>
