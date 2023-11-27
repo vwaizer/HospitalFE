@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import {Link} from 'react-router-dom';
+import { usePatient } from "../../context/PatientInfoContext.jsx";
 
 function createData(id, lName, fName, phoneNumeber, doctorTreat) {
   return { id, lName, fName, phoneNumeber, doctorTreat };
@@ -24,9 +25,28 @@ const rows = [
   createData(5, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B')
 ];
 
+// get patient info 
+// patientId
+// patientLName
+// patientFName
+// patientPhone
+// Doctor
+
+async function getData() {
+  // Get data function
+  // const response = await fetch('http://localhost:5000/api/inpatient');
+  // const data = await response.json();
+  // return data;
+}
+
 export default function TableContent() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const {setPatientID} = usePatient();
+
+  function onClickFunc(patientID){
+    setPatientID(patientID);
+  }
 
   function handleChangePage(event, newPage) {
     setPage(newPage);
@@ -38,6 +58,13 @@ export default function TableContent() {
     console.log(event.target.value);
     setPage(0);
   }
+
+  useEffect(() => {
+    // getData().then((data) => {
+    //   rows = data;
+    // });
+    console.log('get search page data')
+  }, []);
   
   return (
     <TableContainer component={Paper} style={{background: 'var(--m-3-sys-light-surface, #FFF8F6)'}}>
@@ -70,7 +97,7 @@ export default function TableContent() {
               <TableCell align="right">{row.phoneNumeber}</TableCell>
               <TableCell align="right">{row.doctorTreat}</TableCell>
               <TableCell align="center" sx={{width: 24, height: 24}}>
-              <Link to="/Home/Report"> 
+              <Link to="/Home/Report" onClick={() => onClickFunc(row.id)}> 
                 <ArrowRightIcon/>
               </Link>
               </TableCell>

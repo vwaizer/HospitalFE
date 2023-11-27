@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import NavBar from "../../components/NavBar";
 import { Button, Modal, Stack, Typography } from "@mui/material";
@@ -9,28 +9,11 @@ import SearchForm from "./SearchForm";
 import AddForm from "./AddForm";
 import TableContent from "./TableContent";
 
-// const Block = styled.div`
-//   display: flex;
-//   flex-direction: row;
-//   /* background: var(--m-3-sys-light-surface, #fff8f6); */
-//   /* background-color:teal; */
-//   height: 600px;
-// `;
-// const ContextBlock = styled.div`
-//   display: flex;
-//   width: 100%;
-//   flex-direction: column;
-
-// `;
 const Container = styled.div`
   padding: 32px;
 `;
-// const RowFlex = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   flex-direction: row;
-//   width: 100%;
-// `;
+
+
 const SearchPage = () => {
   const [openSearch, setOpenSearch] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
@@ -40,6 +23,7 @@ const SearchPage = () => {
   const onClickFuncAdd = () => {
     setOpenAdd(true);
   }
+
   return (
 
     <>
@@ -76,37 +60,6 @@ const SearchPage = () => {
         <TableContent />
       </Container>
     </>
-
-
-    // <Block>
-    // <NavBar />
-
-    //  <ContextBlock>
-    //   <h1>Search Page</h1>
-    //   <Container>
-    //     <RowFlex>
-    //       <Button variant="contained" startIcon={<SearchIcon/>} style={{backgroundColor:"var(--m-3-sys-light-surface-container-high, #F3E5E3)",color:"red"}} onClick={onClickFuncSearch}>Search</Button>
-    //       <Button variant="contained" startIcon={<AddIcon/>} style={{backgroundColor:"var(--m-3-sys-light-surface-container-high, #F3E5E3)",color:"red"}} onClick={onClickFuncAdd}>Add</Button>
-    //     </RowFlex>
-
-    //   </Container>
-    //   <Modal
-    //   open={openSearch}
-    //   onClose={handleCloseSearch}
-    //   style={{display:"flex",justifyContent:"center",alignItems:"center"}}
-    //   >
-    //       <SearchForm/>
-    //   </Modal>
-    //   <Modal
-    //   open={openAdd}
-    //   onClose={handleCloseAdd}
-    //   style={{display:"flex",justifyContent:"center",alignItems:"center"}}
-    //   >
-    //       <AddForm/>
-    //   </Modal>
-    //   <TableContent/>
-    // </ContextBlock> 
-    // </Block>
   );
 };
 
