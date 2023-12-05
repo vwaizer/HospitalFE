@@ -43,7 +43,7 @@ async function getData(patientId) {
   // return data;
 }
 
-export default function TableInPatient({showTreatment, setShowTreatment, setRecordTreatmentShow}) {
+export default function TableInPatient({showTreatment, setShowTreatment, setRecordTreatmentShow, ...rest}) {
 
   //ROW DATA ADJUST AND QUERY IT TO CREATE DATA FOR TABLE
   const [rows, setRows] = useState([
@@ -83,8 +83,8 @@ export default function TableInPatient({showTreatment, setShowTreatment, setReco
   
   return (
     <>
-    <TableContainer component={Paper} style={{background: 'var(--m-3-sys-light-surface, #FFF8F6)'}}>
-      <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
+    <TableContainer component={Paper} {...rest} style={{background: 'var(--m-3-sys-light-surface, #FFF8F6)'}} >
+      <Table stickyHeader sx={{ minWidth: 650}} aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell align="right" style={{fontWeight:"bold"}}>Record ID</TableCell>

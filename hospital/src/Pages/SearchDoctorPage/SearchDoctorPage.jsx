@@ -31,7 +31,7 @@ const SearchPage = () => {
   ]);
 
   // search submit function
-  async function searchSubmit(event) {
+  function searchSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     // get the data of the form
@@ -39,14 +39,14 @@ const SearchPage = () => {
     console.log(formData.get("patientName"));
     console.log("search submit");
 
-    const response = await fetch('http://localhost:5000/api/inpatient')
-    .then(res => res.json())
-    .catch(err => {
-      setRows([
-        ...rows,
-        createData(1, 'Le', 'Viet Tung', 937506949, '23/9 khu 12 xã long Đức'),
-      ]);
-    });
+    // const response = await fetch('http://localhost:5000/api/inpatient')
+    // .then(res => res.json())
+    // .catch(err => {
+    //   setRows([
+    //     ...rows,
+    //     createData(1, 'Le', 'Viet Tung', 937506949, '23/9 khu 12 xã long Đức'),
+    //   ]);
+    // });
   }
 
   async function addSubmit(event) {
@@ -65,14 +65,14 @@ const SearchPage = () => {
     console.log(formData.get("gender"));
     console.log(formData.get("phoneNumber"));
     console.log(formData.get("address"));
-    const response = await fetch('http://localhost:5000/api/inpatient')
-    .then(res => res.json())
-    .catch(err => {
-      setRows([
-        ...rows,
-        createData(1, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
-      ]);
-    });
+    // const response = await fetch('http://localhost:5000/api/inpatient')
+    // .then(res => res.json())
+    // .catch(err => {
+    //   setRows([
+    //     ...rows,
+    //     createData(1, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
+    //   ]);
+    // });
   }
 
   //open modal function
