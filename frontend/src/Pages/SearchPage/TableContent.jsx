@@ -26,10 +26,21 @@ async function getData() {
 export default function TableContent({rows, ...rest}) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const {setPatientID} = usePatient();
+  const {setPatientInfo} = usePatient();
 
-  function onClickFunc(patientID){
-    setPatientID(patientID);
+  function onClickFunc(row){
+    console.log(row);
+    setPatientInfo({
+      patientID: row.id,
+      patientFName: row.fName,
+      patientLName: row.lName,
+      patientPhoneNumber: row.phoneNumber,
+      patientAddress: row.address,
+      patientGender: row.gender,
+      patientBirthDate: row.dob,
+      patientIpCode: row.ipCode,
+      patientOpCode: row.opCode,
+    });
   }
 
   function handleChangePage(event, newPage) {
@@ -44,7 +55,7 @@ export default function TableContent({rows, ...rest}) {
   }
   
   return (
-    <TableContainer component={Paper} style={{background: 'var(--m-3-sys-light-surface, #FFF8F6)'}}>
+    <TableContainer component={Paper} style={{background: 'var(--m-3-sys-light-surface, #FFF8F6)', maxHeight: '700px'}}>
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -71,10 +82,10 @@ export default function TableContent({rows, ...rest}) {
               </TableCell>
               <TableCell align="right">{row.lName}</TableCell>
               <TableCell align="right">{row.fName}</TableCell>
-              <TableCell align="right">{row.phoneNumeber}</TableCell>
-              <TableCell align="right">{row.doctorTreat}</TableCell>
+              <TableCell align="right">{row.phoneNumber}</TableCell>
+              <TableCell align="right">{row.address}</TableCell>
               <TableCell align="center" sx={{width: 24, height: 24}}>
-              <Link to="/Home/Report" onClick={() => onClickFunc(row.id)}> 
+              <Link to="/Home/Report" onClick={() => onClickFunc(row)}> 
                 <ArrowRightIcon/>
               </Link>
               </TableCell>

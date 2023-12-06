@@ -1,79 +1,85 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import NavBar from "../../components/NavBar";
 import { Button, Modal, Stack, Typography } from "@mui/material";
 // import Container from "@mui/material/Container";
 import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
 import SearchForm from "./SearchForm";
-import AddForm from "./AddForm";
 import TableContent from "./TableContent";
+import { useDoctorSearch } from "../../context/DoctorSearchContext";
 import "./style.css";
 const Container = styled.div`
   padding: 32px;
 `;
 
-function createData(id, lName, fName, phoneNumeber, doctorTreat) {
-  return { id, lName, fName, phoneNumeber, doctorTreat };
+function createData(doctorID, id, fName, lName, phoneNumeber, address) {
+  return { doctorID ,id, lName, fName, phoneNumeber, address };
 }
 
-//ROW DATA ADJUST AND QUERY IT TO CREATE DATA FOR TABLE
+async function getData (doctorName) {
+  try {
+    const response = await fetch('/searchDoctor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ doctorName }),
+    });
+    if(response.ok){
+      const data = await response.json();
+      console.log(data);
+      if (data) {
+        // maper function
+        return data.patientData.map(record => {
+          return(
+          createData(record[0], record[1], record [2], record[3], record[4], record[5]));
+        });
+      }
+      return [];
+    }
+    else{
+      console.error('Server response not OK:', response.statusText);
+      return [];
+    }
+  } catch (error) {
+    console.error('Fetch data error:', error);
+    return []; 
+  }
+}
 
 const SearchPage = () => {
   const [openSearch, setOpenSearch] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
-  const [rows, setRows] = useState([
+  const { doctorSearch, setDoctorSearch } = useDoctorSearch();
+  // const [rows, setRows] = useState([
     // createData(1, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
     // createData(2, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
     // createData(3, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
     // createData(4, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
     // createData(5, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B')
-  ]);
+  // ]);
+
+  const [rows, setRows] = [doctorSearch, setDoctorSearch]
 
   // search submit function
-  function searchSubmit(event) {
+  async function searchSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
     // get the data of the form
-    console.log(formData.get("patientID"));
-    console.log(formData.get("patientName"));
+    console.log(formData.get("doctorID"));
+    console.log(formData.get("doctorName"));
     console.log("search submit");
-
-    // const response = await fetch('http://localhost:5000/api/inpatient')
-    // .then(res => res.json())
-    // .catch(err => {
-    //   setRows([
-    //     ...rows,
-    //     createData(1, 'Le', 'Viet Tung', 937506949, '23/9 khu 12 xã long Đức'),
-    //   ]);
-    // });
+    const doctorName = formData.get("doctorName");
+    const returneddata = await getData(doctorName);
+    console.log('the return data', returneddata);
+    
+    if(returneddata){
+      setRows(returneddata);
+    }
+    else{
+      setRows([]);
+    }
   }
 
-  async function addSubmit(event) {
-    event.preventDefault();
-    // get all the data of the form field
-
-    const formData = new FormData(event.target);
-
-    // get form of add form data
-    console.log(formData.get("patientID"));
-    console.log(formData.get("firstName"));
-    console.log(formData.get("lastName"));
-    console.log(formData.get("opCode"));
-    console.log(formData.get("ipCode"));
-    console.log(formData.get("dateOfBirth"));
-    console.log(formData.get("gender"));
-    console.log(formData.get("phoneNumber"));
-    console.log(formData.get("address"));
-    // const response = await fetch('http://localhost:5000/api/inpatient')
-    // .then(res => res.json())
-    // .catch(err => {
-    //   setRows([
-    //     ...rows,
-    //     createData(1, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
-    //   ]);
-    // });
-  }
 
   //open modal function
   const onClickFuncSearch = () => {
@@ -99,7 +105,7 @@ const SearchPage = () => {
         <Stack mb={5} direction="column" spacing={15}>
           <Stack direction="row" spacing={2} justifyContent="space-between">
             <Typography variant="h2" >
-              Search Page
+              Search Doctor Page
             </Typography>
           </Stack>
           <Stack direction="row" spacing={2} justifyContent="space-between">
@@ -112,15 +118,6 @@ const SearchPage = () => {
               Search
             </Button>
             <SearchForm openSearch={openSearch} searchSubmit={searchSubmit} setOpenSearch={setOpenSearch} />
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              style={{ backgroundColor: "var(--m-3-sys-light-surface-container-high, #F3E5E3)", color: "red" }}
-              onClick={onClickFuncAdd}
-            >
-              Add
-            </Button>
-            <AddForm openAdd={openAdd} setOpenAdd={setOpenAdd} addSubmit={addSubmit}/>
           </Stack>
         </Stack>
 

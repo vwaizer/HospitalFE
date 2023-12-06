@@ -70,7 +70,7 @@ const SearchForm = ({ openSearch, setOpenSearch , searchSubmit}) => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h4" component="h2">
-            Search Patient
+            Search Doctor
           </Typography>
           <Divider />
           {/* Search form */}
@@ -78,25 +78,25 @@ const SearchForm = ({ openSearch, setOpenSearch , searchSubmit}) => {
           <Box component="" m={3} display="flex" alignItems="center" flexGrow={'1'} >
             <Stack spacing={1} display="flex" flex="1" justifyContent='center'>
               <Typography variant="h6">
-                Patient ID
+                Doctor ID
               </Typography>
               <TextField
-                label="Patient ID"
-                id="patientID"
-                name="patientID"
-                autoComplete="patientID"
+                label="Doctor ID"
+                id="doctor"
+                name="doctorID"
+                autoComplete="doctorID"
                 variant="filled"
                 autoFocus
                 style={{ width: "100%" }}
               />
               <Typography variant="h6" sx={{}}>
-                Patient Name
+                Doctor name
               </Typography>
               <TextField
-                label="Patient Name"
-                id="patientName"
-                name="patientName"
-                autoComplete="patientName"
+                label="Doctor Name"
+                id="doctorName"
+                name="doctorName"
+                autoComplete="doctorName"
                 variant="filled"
                 autoFocus
                 style={{ width: "100%" }}
@@ -110,26 +110,6 @@ const SearchForm = ({ openSearch, setOpenSearch , searchSubmit}) => {
         </Box>
       </Modal>
     </>
-
-    // <DisplayBlock>
-    //     <FormBlock>
-    //         <h2>Search patient</h2>
-    //         <SubBlock> 
-    //         <div style={{color:" var(--m-3-sys-light-inverse-primary, #FFB4A8)"}} >Patient ID</div>
-    //            <InputBlock>
-
-    //            <Input style={{width:"100%"}} />
-    //             <Button><SearchIcon/></Button>
-    //            </InputBlock>
-    //             <div style={{color:" var(--m-3-sys-light-inverse-primary, #FFB4A8)"}}>Doctor treat/examine</div>
-    //             <InputBlock>
-    //            <Input style={{width:"100%"}}/>
-    //             <Button><SearchIcon/></Button>
-    //            </InputBlock>
-    //         </SubBlock>
-    //         <Button style={{color:"red"}}>Submit</Button>
-    //     </FormBlock>
-    // </DisplayBlock>
   )
 }
 

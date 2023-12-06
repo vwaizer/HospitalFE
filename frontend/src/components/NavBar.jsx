@@ -23,6 +23,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 const drawerWidth = 248;
 
+function handleLogOut(){
+  localStorage.removeItem('token');
+  console.log('log out')
+}
 
 function ListItemLink({ text, icon, to, ...other }) {
 
@@ -46,7 +50,7 @@ function ListItemLink({ text, icon, to, ...other }) {
 function ListItemLogOut({ text, icon, to, ...other }) {
   return (
     <>
-      {/* <NavLink to={to} {...other} style={{ textDecoration: 'none', color: 'inherit' }}> */}
+      <NavLink to={to} {...other} style={{ textDecoration: 'none', color: 'inherit' }}>
       {/* <Form method="POST" >
         <button type="submit" style={{ 
           background: 'none',
@@ -68,7 +72,7 @@ function ListItemLogOut({ text, icon, to, ...other }) {
         </ListItem>
         {/* </button>
       </Form> */}
-      {/* </NavLink> */}
+      </NavLink>
     </>
   )
 }
@@ -92,8 +96,9 @@ function ResponsiveDrawer(props) {
       <List sx={{display: 'flex', flexDirection:'column',flexGrow: '1'}}>
         <ListItemLink text="SearchPage" icon={<SearchIcon />} to="/Home/SearchPage" />
         <ListItemLink text="Report" icon={<DescriptionIcon />} to="/Home/Report" />
+        <ListItemLink text="SearchDoctorPage" icon={<SearchIcon />} to="/Home/SearchDoctor" />
       </List>
-        <ListItemLogOut text="Log Out" icon={<LogoutIcon />} to={"/Logout"}/>
+        <ListItemLogOut text="Log Out" icon={<LogoutIcon />} to={"/LogIn"} onClick={handleLogOut}/>
     </>
   );
 

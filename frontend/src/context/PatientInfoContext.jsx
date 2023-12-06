@@ -7,10 +7,21 @@ export function usePatient() {
 }
 
 export function PatientInfoProvider({ children }) {
-    const [patientID, setPatientID] = useState(0);
+    const [patientInfo, setPatientInfo] = useState({
+        patientID: '',
+        patientFName: '',
+        patientLName: '',
+        patientPhoneNumber: '',
+        patientAddress: '',
+        patientGender: '',
+        patientBirthDate: '',
+        patientIpCode: '',
+        patientOpCode: '',
+    });
+
     const value = {
-        patientID,
-        setPatientID,
+        patientInfo,
+        setPatientInfo,
     }
 
     return (

@@ -16,6 +16,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
+import { useAuth } from "../../context/AuthContext.jsx";
 // import axios from "axios";
 
 
@@ -77,7 +78,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-
+    const { setAuthenticated } = useAuth();
     const handleLogin = async() => {
         try{
           const response = await fetch('/login', {
@@ -90,6 +91,8 @@ const LoginPage = () => {
         if (response.ok) {
           // Redirect to the Home page or set some authentication flag
           window.location = "/Home";
+          localStorage.setItem('username', username);
+          setAuthenticated(username)
         } else {
           const data = await response.json();
           setError(data.message);

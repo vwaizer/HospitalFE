@@ -70,6 +70,7 @@ const style = {
 
 const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
   const [open, setOpen] = [openAdd, setOpenAdd]
+  const [patientType, setPatientType] = useState('inPatient');
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   return (
@@ -210,7 +211,7 @@ const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
                   />
                 </Stack>
               </Stack>
-              <Stack spacing={1} direction={'row'} justifyContent={'center'} alignItems={'center'} width={'100%'}>
+              <Stack spacing={1} direction={'row'} justifyContent={'space-between'} alignItems={'center'} width={'100%'}>
                 <Stack width={'40%'}>
                   <Typography variant="h6">
                     Phone Number
@@ -222,6 +223,19 @@ const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
                     autoComplete="phoneNumber"
                     variant="filled"
                     type='tel'
+                    autoFocus
+                    style={{ width: "100%" }}
+                  />
+                </Stack>
+                <Stack width={'40%'}>
+                  <Typography variant="h6" sx={{}}>
+                    Nurse ID
+                  </Typography>
+                  <TextField
+                    id="nurseID"
+                    name="nurseID"
+                    autoComplete="nurseID"
+                    variant='filled'
                     autoFocus
                     style={{ width: "100%" }}
                   />

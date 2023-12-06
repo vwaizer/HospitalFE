@@ -8,29 +8,68 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchForm from "./SearchForm";
 import AddForm from "./AddForm";
 import TableContent from "./TableContent";
+import { usePatientSearch } from "../../context/PatientSearchContext.jsx";
+import { usePatient } from "../../context/PatientInfoContext.jsx";
 import "./style.css";
 const Container = styled.div`
   padding: 32px;
 `;
 
-function createData(id, lName, fName, phoneNumeber, doctorTreat) {
-  return { id, lName, fName, phoneNumeber, doctorTreat };
+function createData(id, fName, lName, phoneNumeber, address) {
+  return { id, lName, fName, phoneNumeber, address };
 }
 
 //ROW DATA ADJUST AND QUERY IT TO CREATE DATA FOR TABLE
 
+async function getData (patientID, patientName) {
+  try{
+    const response = await fetch('/searchID', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ patientID, patientName }),
+    });
+    if(response.ok){
+      const data = await response.json()
+      console.log('server respone', data);
+      console.log(data);
+      if(data && data.patientData){
+        const patient = data.patientData;
+        console.log(patient);
+        return( patient.rows.map((item) => {
+          return {
+            id: item[0],
+            ipCode: item[1] ? item[1] : 'N/A',
+            opCode: item[2] ? item[2] : 'N/A',
+            fName: item[3],
+            lName: item[4],
+            phoneNumber: item[5],
+            address: item[6],
+            dob: new Date(item[7]).toLocaleDateString(),
+            gender: item[8] === 'F' ? 'female' : 'male',
+          };
+        }));
+      }
+    }
+    else{
+      console.error('Server response not OK:', response.statusText);
+    }
+  }catch (error){
+    console.error('Error:', error);
+  }
+}
+
+
 const SearchPage = () => {
   const [openSearch, setOpenSearch] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
-  const [rows, setRows] = useState([
-    // createData(1, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
-    // createData(2, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
-    // createData(3, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
-    // createData(4, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
-    // createData(5, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B')
-  ]);
+  const {patientSearch, setPatientSearch} = usePatientSearch();
+  const [rows, setRows] = [patientSearch, setPatientSearch];
+  const setPatientInfo = usePatient();
 
   // search submit function
+
   async function searchSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
@@ -41,40 +80,14 @@ const SearchPage = () => {
 
     const patientID = formData.get("patientID");
     const patientName = formData.get("patientName");
-    try{
-      const response = await fetch('/searchID', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ patientID, patientName }),
-      });
-      if(response.ok){
-        const data = await response.json()
-        console.log(data);
-        if(data && data.patientData){
-          const patient = data.patientData;
-          setRows([
-            ...rows,
-            createData(patient[0], patient[1], patient[2], patient[3], patient[4]),
-          ]);
-        }
-      }
-      else{
-        console.error('Server response not OK:', response.statusText);
-      }
-    }catch (error){
-      console.error('Error:', error);
+    const returnedData = await getData(patientID, patientName);
+    console.log('the return data');
+    console.log(returnedData);
+    if (returnedData) 
+    {
+      setRows(returnedData)
     }
-
-    // const response = await fetch('http://localhost:5000/api/inpatient')
-    // .then(res => res.json())
-    // .catch(err => {
-    //   setRows([
-    //     ...rows,
-    //     createData('123', 'Le', 'Viet Tung', '937506949', '23/9 khu 12 xã long Đức'),
-    //   ]);
-    // });
+    else setRows([]);
   }
 
   async function addSubmit(event) {
@@ -93,14 +106,35 @@ const SearchPage = () => {
     console.log(formData.get("gender"));
     console.log(formData.get("phoneNumber"));
     console.log(formData.get("address"));
-    const response = await fetch('http://localhost:5000/api/inpatient')
-    .then(res => res.json())
-    .catch(err => {
-      setRows([
-        ...rows,
-        createData(1, 'Le', 'Viet Tung', 937506949, 'Nguyen Van A Le Thi B'),
-      ]);
-    });
+    try{
+      const response = await fetch('/addPatient', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          id: formData.get("patientID"),
+          fname: formData.get("firstName"),
+          lname: formData.get("lastName"),
+          opcode: formData.get("opCode"),
+          ipcode: formData.get("ipCode"),
+          dob: formData.get("dateOfBirth"),
+          sex: formData.get("gender") ? 'F' : 'M',
+          phone_no: formData.get("phoneNumber"),
+          address: formData.get("address"),
+          nurse_uc: formData.get("nurseID"),
+        }),
+      });
+      if(response.ok){
+        const data = await response.json();
+        console.log(data);
+      }
+      else{
+        console.error('Server response not OK:', response.statusText);
+      }
+    }catch (error){
+      console.error('Error:', error);
+    }
   }
 
   //open modal function

@@ -26,10 +26,8 @@ async function getData() {
 export default function TableContent({rows, ...rest}) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const {setPatientID} = usePatient();
 
-  function onClickFunc(patientID){
-    setPatientID(patientID);
+  function onClickFunc(){
   }
 
   function handleChangePage(event, newPage) {
@@ -44,10 +42,11 @@ export default function TableContent({rows, ...rest}) {
   }
   
   return (
-    <TableContainer component={Paper} style={{background: 'var(--m-3-sys-light-surface, #FFF8F6)'}}>
+    <TableContainer component={Paper} style={{background: 'var(--m-3-sys-light-surface, #FFF8F6)', maxHeight: '700px'}}>
       <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
+            <TableCell style={{fontWeight:"bold"}}>doctorID</TableCell>
             <TableCell style={{fontWeight:"bold"}}>ID</TableCell>
             <TableCell align="right" style={{fontWeight:"bold"}}>Last Name</TableCell>
             <TableCell align="right" style={{fontWeight:"bold"}}>First Name&nbsp;</TableCell>
@@ -62,19 +61,18 @@ export default function TableContent({rows, ...rest}) {
           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
           .map((row) => (
             <TableRow
-              key={row.id}
+              key={row.id + row.doctorID}
               hover={true}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.id}
-              </TableCell>
+            > 
+            <TableCell component="th" scope="row">{row.doctorID}</TableCell>
+              <TableCell>{row.id}</TableCell>
               <TableCell align="right">{row.lName}</TableCell>
               <TableCell align="right">{row.fName}</TableCell>
               <TableCell align="right">{row.phoneNumeber}</TableCell>
-              <TableCell align="right">{row.doctorTreat}</TableCell>
+              <TableCell align="right">{row.address}</TableCell>
               <TableCell align="center" sx={{width: 24, height: 24}}>
-              <Link to="/Home/Report" onClick={() => onClickFunc(row.id)}> 
+              <Link to="/Home/Report" onClick={() => onClickFunc()}> 
                 <ArrowRightIcon/>
               </Link>
               </TableCell>

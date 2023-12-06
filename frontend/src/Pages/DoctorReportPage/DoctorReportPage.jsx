@@ -3,9 +3,9 @@ import styled from "styled-components";
 import { Button, Modal, Stack, Typography, Box, Container, Collapse } from "@mui/material";
 // import Container from "@mui/material/Container";
 
-import TableInPatient from "./TableInPatient";
-import TableOutPatient from "./TableOutPatient";
-import TableInPatientTreatment from "./TableInPatientTreatment";
+import TableInPatient from "./TableInPatient.jsx";
+import TableOutPatient from "./TableOutPatient.jsx";
+import TableInPatientTreatment from "./TableInPatientTreatment.jsx";
 import TableOutPatientExamine from "./TableOutPatientExamine.jsx";
 import { usePatient } from "../../context/PatientInfoContext.jsx";
 import "./reportpage.css"
@@ -63,7 +63,7 @@ const Report = () => {
 
   return (
     <>
-      <Typography variant="h2" p={`32px`}>Report</Typography>
+      <Typography variant="h2" p={`32px`}>Doctor search</Typography>
       <Container maxWidth={false} sx={{ width: '85%' }} >
         <Stack mb={5} direction="column" spacing={10}>
           <Stack direction="row" spacing={2} justifyContent="space-between">
