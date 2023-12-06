@@ -88,6 +88,32 @@ oracledb.createPool({
             res.status(500).send('Server Error');
         }
     });
+    app.post('/inpatientTreatment', async (req, res) => {
+        try{
+            const { recordID } = req.body;
+            const connection = await pool.getConnection();
+            const result = await connection.execute(
+                `select tm.treatment_id, tm.result, TO_CHAR(tm.start_date, 'dd-mm-yyyy'), TO_CHAR(tm.end_date, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage*m.current_price
+                from treatment tm, treat t, employee d, treat_use_med u, medication m
+                where tm.treatment_id = t.treatment_id and d.unique_code = t.doctor_id and tm.record_id = :recordID 
+                and u.treatment_id = tm.treatment_id and m.unique_code = u.med_id`,
+                {recordID}
+            );
+            await connection.close();
+            if (result.rows.length > 0){
+                const treatments = result.rows
+                console.log('Found record', treatments[0][0]);
+                res.json({ inpatient_treatment : treatments });
+            }
+            else{
+                console.error('Record not found', recordID); 
+                res.status(401).json({ success: false, message: 'Treatment not found'});
+            }
+        } catch (error){
+            console.error(error.message);
+            res.status(500).send('Server Error');
+        }
+    });
 }).catch(err => {
     console.error('Database connection error:', err);
 });
