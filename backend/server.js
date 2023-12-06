@@ -317,13 +317,13 @@ oracledb.createPool({
             let result1, result2;
             if(ipcode){
                 result1 = await connection.execute(
-                    'INSERT INTO INPATIENT VALUES (:id, :ipcode, :fname, :lname, :sex, :address, :dob, :phone_no, :nurse_uc)',
+                    `INSERT INTO INPATIENT VALUES (:id, :ipcode, :fname, :lname, :sex, :address, TO_DATE(:dob, 'YYYY-MM-DD'), to_number(:phone_no), :nurse_uc)`,
                     { id, ipcode, fname, lname, sex, address, dob, phone_no, nurse_uc}
                 );
             }
             if(opcode){
                 result2 = await connection.execute(
-                    'INSERT INTO OUTPATIENT VALUES (:id, :opcode, :fname, :lname, :sex, :address, :dob, :phone_no)',
+                    `INSERT INTO OUTPATIENT VALUES (:id, :opcode, :fname, :lname, :sex, :address, TO_DATE(:dob, 'YYYY-MM-DD'), to_number(:phone_no))`,
                     {id, ipcode, fname, lname, sex, address, dob, phone_no}
                 );
             }
