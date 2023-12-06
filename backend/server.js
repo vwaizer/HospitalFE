@@ -127,8 +127,8 @@ oracledb.createPool({
             await connection.close();
             if (result.rows.length > 0){
                 const record = result.rows
-                console.log('Found record', record[0][0]);
-                res.json({ inpatient_record : record });
+                console.log('Found record', record[0]);
+                res.json({ outpatient_record : record });
             }
             else{
                 console.error('Record not found', patientId); 
