@@ -68,7 +68,7 @@ const style = {
   p: 4,
 };
 
-const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
+const AddForm = ({ openAdd, setOpenAdd, addSubmit, mustHaveIpOrOp, ifipMustHaveNurse, invalidIpCode, invalidOpCode}) => {
   const [open, setOpen] = [openAdd, setOpenAdd]
   const [patientType, setPatientType] = useState('inPatient');
   const handleOpen = () => setOpen(true);
@@ -156,12 +156,14 @@ const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
                     Op code
                   </Typography>
                   <TextField
+                    error={mustHaveIpOrOp || invalidOpCode}
                     label="Op code"
                     id="opCode"
                     name="opCode"
                     variant="filled"
                     autoFocus
                     style={{ width: "100%" }}
+                    helperText={mustHaveIpOrOp ? 'Must have either Ip code or Op code' : (invalidOpCode ? 'Invalid Op code' : '')}
                   />
                 </Stack>
                 <Stack width={'40%'}>
@@ -169,12 +171,14 @@ const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
                     Ip code
                   </Typography>
                   <TextField
+                    error={mustHaveIpOrOp || invalidIpCode}
                     label="Ip code"
                     id="ipCode"
                     name="ipCode"
                     variant='filled'
                     autoFocus
                     style={{ width: "100%" }}
+                    helperText={mustHaveIpOrOp ? 'Must have either Ip code or Op code' : (invalidIpCode ? 'Invalid Ip code' : '')}
                   />
                 </Stack>
               </Stack>
@@ -232,6 +236,7 @@ const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
                     Nurse ID
                   </Typography>
                   <TextField
+                    error={ifipMustHaveNurse}
                     label={'Nurse ID'}
                     id="nurseID"
                     name="nurseID"
@@ -239,6 +244,7 @@ const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
                     variant='filled'
                     autoFocus
                     style={{ width: "100%" }}
+                    helperText={ifipMustHaveNurse ? 'Must have valid nurse ID if is inpatient' : ''}
                   />
                 </Stack>
               </Stack>

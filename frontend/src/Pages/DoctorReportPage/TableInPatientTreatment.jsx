@@ -29,8 +29,9 @@ import { usePatient } from "../../context/PatientInfoContext.jsx";
 //   return total;
 // }
 
-function createData(treatmentID, result, startDate, endDate, doctor, medications,dosage , totalFee) {
-  return { treatmentID, result, startDate, endDate, doctor, medications,dosage , totalFee };
+function createData(treatmentID, result, startDate, endDate, doctor, medications, dosage, medicationFee ,fee) {
+  const totalFee = fee + medicationFee;
+  return { treatmentID, result, startDate, endDate, doctor, medications, dosage, medicationFee ,fee, totalFee };
 }
 
 
@@ -44,7 +45,6 @@ function createData(treatmentID, result, startDate, endDate, doctor, medications
 // fee (TREATMENT table)
 
 async function getData(recordID, doctorID) {
-  console.log('Get inpatient Treatment data');
   try {
     const response = await fetch('/inpatientTreatmentDoc', {
       method: 'POST',
@@ -55,12 +55,11 @@ async function getData(recordID, doctorID) {
     });
     if(response.ok){
       const data = await response.json();
-      console.log('server respone');
       console.log(data);
       if (data) {
         // maper function
         return data.inpatient_treatment.map(record => 
-          createData(record[0], record[1], record[2], record[3], record[4], record[5], record[6], record[7])
+          createData(record[0], record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8])
           );
       }
       return null;
@@ -103,8 +102,6 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
 
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(+event.target.value);
-    console.log(+event.target.value);
-    console.log(event.target.value);
     setPage(0);
   }
 
@@ -143,16 +140,14 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
   function pdfRowData(pdfRows) {
     const selectedRows = pdfRows.filter((row) => isSelected(row.treatmentID));
     const concatenatedRows = selectedRows.map((row) => {
-      const { treatmentID, result, startDate, endDate, doctor, medications, dosage, totalFee } = row;
-      return [treatmentID, result, startDate, endDate, doctor, medications, dosage, totalFee];
+      const { treatmentID, result, startDate, endDate, doctor, medications, dosage, medicationFee ,fee, totalFee } = row;
+      return [treatmentID, result, startDate, endDate, doctor, medications, dosage, medicationFee ,fee, totalFee];
     });
     return concatenatedRows;
   }
   // This code run once on mount.
   useEffect(() => {
     getData(recordTreatmentShow, doctorID).then((data) => {
-      console.log('parse data');
-      console.log(data);
       if (data === null) {
         setRows([]);
       } else {
@@ -162,9 +157,9 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
   }, [recordTreatmentShow]);
 
   return (
-    <Box mt={5} mb={3}>
+<Box mt={5} mb={3}>
       <Typography variant='h4' mb={2}>Treatment table</Typography>
-      <TableContainer component={Paper} style={{ background: 'var(--m-3-sys-light-surface, #FFF8F6)' }}>
+      <TableContainer component={Paper} style={{ background: 'var(--m-3-sys-light-surface, #FFF8F6)' , maxHeight: '700px'}}>
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table" style={{ tableLayout: 'auto' }}>
           <TableHead>
             <TableRow>
@@ -174,6 +169,7 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
               <TableCell align="right" style={{ fontWeight: "bold" }}>End date&nbsp;</TableCell>
               <TableCell align="right" style={{ fontWeight: "bold" }}>Doctor&nbsp;</TableCell>
               <TableCell align="right" style={{ fontWeight: "bold" }}>Medication&nbsp;</TableCell>
+              <TableCell align="right" style={{ fontWeight: "bold" }}>Fee&nbsp;</TableCell>
               <TableCell align="right" style={{ fontWeight: "bold" }}>Total fee&nbsp;</TableCell>
               <TableCell align="right" style={{ fontWeight: "bold" }}>
                 <Checkbox
@@ -204,7 +200,7 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
                     <TableCell align="right">{row.startDate}</TableCell>
                     <TableCell align="right">{row.endDate}</TableCell>
                     <TableCell align="right">{row.doctor}</TableCell>
-                    <TableCell align="right">{row.medications + ' x ' + row.dosage}</TableCell>
+                    <TableCell align="right">{row.medications + ' x ' + row.dosage + ': ' + row.medicationFee +  ' $'}</TableCell>
                     {/* <TableCell align="right">
                     {row.medications.map((medication,index) => {
                       return (
@@ -215,6 +211,7 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
                       );
                     })}
                     </TableCell> */}
+                    <TableCell align="right">{row.fee} $</TableCell>
                     <TableCell align="right">{row.totalFee} $</TableCell>
                     <TableCell
                       align="center"
@@ -255,8 +252,24 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
         {title: 'Start date'},
         {title:  'End date'},
         {title:  'Doctor'},
-        {title: 'Medications'},
-        {title: 'Total fee'}
+        {
+          title: 'Medications',
+          style: {
+            width: 38
+          }
+        },
+        {
+          title: 'Fee',
+          style: {
+            width: 13
+          }
+        },
+        {
+          title: 'Total fee',
+          style: {
+            width: 13
+          }
+        }
         ],pdfRowData(rows))}> export pdf </Button>}
     </Box>
 

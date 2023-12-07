@@ -32,18 +32,15 @@ async function getData (patientID, patientName) {
     });
     if(response.ok){
       const data = await response.json()
-      console.log('server respone', data);
-      console.log(data);
       if(data && data.patientData){
         const patient = data.patientData;
-        console.log(patient);
         return( patient.rows.map((item) => {
           return {
             id: item[0],
             ipCode: item[1] ? item[1] : 'N/A',
             opCode: item[2] ? item[2] : 'N/A',
-            fName: item[3],
-            lName: item[4],
+            fName: item[4],
+            lName: item[3],
             phoneNumber: item[5],
             address: item[6],
             dob: new Date(item[7]).toLocaleDateString(),
@@ -66,6 +63,10 @@ const SearchPage = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const {patientSearch, setPatientSearch} = usePatientSearch();
   const [rows, setRows] = [patientSearch, setPatientSearch];
+  const [mustHaveIpOrOp, setMustHaveIpOrOp] = useState(false);
+  const [ifipMustHaveNurse, setIfipMustHaveNurse] = useState(false);
+  const [invalidIpCode, setInvalidIpCode] = useState(false);
+  const [invalidOpCode, setInvalidOpCode] = useState(false);
   const setPatientInfo = usePatient();
 
   // search submit function
@@ -74,15 +75,10 @@ const SearchPage = () => {
     event.preventDefault();
     const formData = new FormData(event.target);
     // get the data of the form
-    console.log('patient id:', formData.get("patientID"));
-    console.log('patient name:', formData.get("patientName"));
-    console.log("search submit");
 
     const patientID = formData.get("patientID");
     const patientName = formData.get("patientName");
     const returnedData = await getData(patientID, patientName);
-    console.log('the return data');
-    console.log(returnedData);
     if (returnedData) 
     {
       setRows(returnedData)
@@ -95,17 +91,40 @@ const SearchPage = () => {
     // get all the data of the form field
 
     const formData = new FormData(event.target);
+    
+    const Ipregex = /\bIP\w*/g;
+    const Opregex = /\bOP\w*/g;
+    if(formData.get("ipCode") === "" && formData.get("opCode") === ""){
+      setMustHaveIpOrOp(true);
+      return;
+    }
+    else{
+      setMustHaveIpOrOp(false);
+    }
+    if(formData.get("ipCode") !== "" && formData.get("nurseID") === ""){
+      setIfipMustHaveNurse(true);
+      return;
+    }
+    else{
+      setIfipMustHaveNurse(false);
+    }
+    
+    if(formData.get("ipCode") !== "" && !Ipregex.test(formData.get("ipCode"))){
+      setInvalidIpCode(true);
+      return;
+    }
+    else{
+      setInvalidIpCode(false);
+    }
+    if(formData.get("opCode") !== "" && !Opregex.test(formData.get("opCode"))){
+      setInvalidOpCode(true);
+      return;
+    }
+    else{
+      setInvalidOpCode(false);
+    }
 
-    // get form of add form data
-    console.log(formData.get("patientID"));
-    console.log(formData.get("firstName"));
-    console.log(formData.get("lastName"));
-    console.log(formData.get("opCode"));
-    console.log(formData.get("ipCode"));
-    console.log(formData.get("dateOfBirth"));
-    console.log(formData.get("gender"));
-    console.log(formData.get("phoneNumber"));
-    console.log(formData.get("address"));
+    
     try{
       const response = await fetch('/addPatient', {
         method: 'POST',
@@ -119,7 +138,7 @@ const SearchPage = () => {
           opcode: formData.get("opCode"),
           ipcode: formData.get("ipCode"),
           dob: formData.get("dateOfBirth"),
-          sex: formData.get("gender") ? 'F' : 'M',
+          sex: formData.get("gender") === 'F' ? 'F' : 'M',
           phone_no: formData.get("phoneNumber"),
           address: formData.get("address"),
           nurse_uc: formData.get("nurseID"),
@@ -127,13 +146,12 @@ const SearchPage = () => {
       });
       if(response.ok){
         const data = await response.json();
-        console.log(data);
       }
       else{
-        console.error('Server response not OK:', response.statusText);
+        // console.error('Server response not OK:', response.statusText);
       }
     }catch (error){
-      console.error('Error:', error);
+      // console.error('Error:', error);
     }
   }
 
@@ -182,7 +200,7 @@ const SearchPage = () => {
             >
               Add
             </Button>
-            <AddForm openAdd={openAdd} setOpenAdd={setOpenAdd} addSubmit={addSubmit}/>
+            <AddForm openAdd={openAdd} setOpenAdd={setOpenAdd} addSubmit={addSubmit} mustHaveIpOrOp={mustHaveIpOrOp} ifipMustHaveNurse={ifipMustHaveNurse} invalidIpCode={invalidIpCode} invalidOpCode={invalidOpCode}/>
           </Stack>
         </Stack>
 

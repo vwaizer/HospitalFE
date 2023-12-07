@@ -48,8 +48,6 @@ export default function TableContent({rows, ...rest}) {
   
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(+event.target.value);
-    console.log(+event.target.value);
-    console.log(event.target.value);
     setPage(0);
   }
   
@@ -59,8 +57,8 @@ export default function TableContent({rows, ...rest}) {
         <TableHead>
           <TableRow>
             <TableCell style={{fontWeight:"bold"}}>ID</TableCell>
-            <TableCell align="right" style={{fontWeight:"bold"}}>First Name</TableCell>
-            <TableCell align="right" style={{fontWeight:"bold"}}>Last Name&nbsp;</TableCell>
+            <TableCell align="right" style={{fontWeight:"bold"}}>Last Name</TableCell>
+            <TableCell align="right" style={{fontWeight:"bold"}}>First Name&nbsp;</TableCell>
             <TableCell align="right" style={{fontWeight:"bold"}}>Phone Number&nbsp;</TableCell>
             <TableCell align="right" style={{fontWeight:"bold"}}>Address&nbsp;</TableCell>
             <TableCell align="right" style={{fontWeight:"bold"}}></TableCell>
@@ -79,8 +77,8 @@ export default function TableContent({rows, ...rest}) {
               <TableCell component="th" scope="row">
                 {row.id}
               </TableCell>
-              <TableCell align="right">{row.lName}</TableCell>
               <TableCell align="right">{row.fName}</TableCell>
+              <TableCell align="right">{row.lName}</TableCell>
               <TableCell align="right">{row.phoneNumber}</TableCell>
               <TableCell align="right">{row.address}</TableCell>
               <TableCell align="center" sx={{width: 24, height: 24}}>

@@ -2,6 +2,7 @@
 import { Margin } from "@mui/icons-material";
 import jsPDFInvoiceTemplate ,{ OutputType, jsPDF } from "jspdf-invoice-template";
 import { PureComponent } from 'react';
+import { DoctorSearchProvider } from "../../context/DoctorSearchContext";
 
 
         // <Typography>Treatment ID: {data.treatmentID}</Typography>
@@ -22,6 +23,16 @@ export function pdfGenerate(headers, data) {
   var tableData;
   var totalPrice = data.reduce((total, row) => total + row[7], 0);
   if (headers.length > 0 && headers[0].title === "ExamineID") {
+
+    // ExamineID [0]
+    // Result [1]
+    // Exam date [2]
+    // Next exam [3]
+    // Diagnosis [4]
+    // Doctor [5]
+    // Medication [6] [7] [8]
+    // fee [9]
+    // Total fee [10]
     tableData = data.map((row) => {
       return [
         row[0] ? row[0] + '\n' + '\n' : '',
@@ -30,12 +41,21 @@ export function pdfGenerate(headers, data) {
         row[3] ? row[3] : '',
         row[4] ? row[4] : '',
         row[5] ? row[5] : '',
-        row[6] && row[7] ? row[6] + ' x ' + row[7] : '',
-        row[8] ? row[8] + ' $' : '',
+        row[6] && row[7] ? row[6] + ' x ' + row[7] + ' : ' + row[8] + ' $' : '',
+        row[9] ? row[9] + ' $' : '',
+        row[10] ? row[10] + ' $' : '',
       ];
     });
-    totalPrice = data.reduce((total, row) => total + parseFloat(row[8]) || 0, 0);
+    totalPrice = data.reduce((total, row) => total + parseFloat(row[10]) || 0, 0);
   } else {
+    // TreatmentID [0]
+    // Result [1] 
+    // Start date [2]
+    // End date [3]
+    // Doctor [4]
+    // Medication [5] [6] [7] 
+    // fee [8]
+    // Total fee [9]
     tableData = data.map((row) => {
       return [
         row[0] ? row[0] + '\n' + '\n' : '',
@@ -43,17 +63,14 @@ export function pdfGenerate(headers, data) {
         row[2] ? row[2] : '',
         row[3] ? row[3] : '',
         row[4] ? row[4] : '',
-        row[5] && row[6] ? row[5] + ' x ' + row[6] : '',
-        row[7] ? row[7] + ' $' : '',
+        row[5] && row[6] ? row[5] + ' x ' + row[6] + ': ' + row[7] + ' $': '',
+        row[8] ? row[8] + ' $' : '',
+        row[9] ? row[9] + ' $' : '',
       ];
     });
-    totalPrice = data.reduce((total, row) => total + parseFloat(row[7]) || 0, 0);
+    totalPrice = data.reduce((total, row) => total + parseFloat(row[9]) || 0, 0);
   }
   
-  console.log('table data');
-  console.log(tableData);
-  console.log('headers');
-  console.log(headers);
   var props = {
     outputType: OutputType.Save,
     returnJsPDFDocObject: true,
@@ -99,8 +116,6 @@ export function pdfGenerate(headers, data) {
       otherInfo: "www.website.al",
     },
     invoice: {
-      label: "Invoice #: ",
-      num: 19,
       invDate: "Payment Date: 01/01/2021 18:12",
       invGenDate: "Invoice Date: 02/02/2021 10:17",
       headerBorder: false,
@@ -131,7 +146,6 @@ export function pdfGenerate(headers, data) {
     pageLabel: "Page ",
   };
   var pdfCreated = jsPDFInvoiceTemplate(props); //returns number of pages created
-  console.log(pdfCreated);
   // pdfCreated.jsPDFDocObject.save(); //or .output('<outputTypeHere>');
 
 }

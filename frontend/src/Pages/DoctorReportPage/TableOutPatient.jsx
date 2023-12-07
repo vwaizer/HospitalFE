@@ -38,7 +38,6 @@ async function getData(patientID, doctorID) {
   // const response = await fetch('http://localhost:5000/api/inpatient');
   // const data = await response.json();
   // return data;
-  console.log('Get outpatient record');
   try {
     const response = await fetch('/outpatientRecordDoc', {
       method: 'POST',
@@ -49,8 +48,6 @@ async function getData(patientID, doctorID) {
     });
     if(response.ok){
       const data = await response.json();
-      console.log('server respone');
-      console.log(data);
       if (data && data.outpatient_record && data.outpatient_record.length > 0) {
         // maper function
         return data.outpatient_record.map(record => 
@@ -60,11 +57,11 @@ async function getData(patientID, doctorID) {
       return null;
     }
     else{
-      console.error('Server response not OK:', response.statusText);
+      // console.error('Server response not OK:', response.statusText);
       return null;
     }
   } catch (error) {
-    console.error('Fetch data error:', error);
+    // console.error('Fetch data error:', error);
     return null; 
   }
 }
@@ -94,15 +91,11 @@ export default function TableOutPatient({showExamine, setShowExamine, setRecordE
 
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(+event.target.value);
-    console.log(+event.target.value);
-    console.log(event.target.value);
     setPage(0);
   }
   
   useEffect(() => {
     getData(patientID, doctorID).then((data) => {
-      console.log('parsed data');
-      console.log(data);
       if(data === null){
         setRows([]);
       }else{

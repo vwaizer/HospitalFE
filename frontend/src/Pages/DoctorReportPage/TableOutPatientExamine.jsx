@@ -21,16 +21,11 @@ import {
 import Detail from './OutPaitientDetail';
 import {pdfGenerate} from './PdfPrinter';
 import { usePatient } from "../../context/PatientInfoContext.jsx";
-function totalFeeCalculation(treatementFee ,medications) {
-  let total = treatementFee;
-  medications.forEach((medication) => {
-    total += medication.priceperbox * medication.quantity;
-  });
-  return total;
-}
 
-function createData(examID, result, examDate, nextExam, diagnosis, doctor, medications, dosage, totalFee) {
-  return { examID, result, examDate, nextExam, diagnosis, doctor, medications,dosage , totalFee};
+
+function createData(examID, result, examDate, nextExam, diagnosis, doctor, medications,dosage , medicationFee, fee) {
+  const totalFee = fee + medicationFee;
+  return { examID, result, examDate, nextExam, diagnosis, doctor, medications,dosage , medicationFee, fee, totalFee};
 }
 
 
@@ -45,7 +40,6 @@ function createData(examID, result, examDate, nextExam, diagnosis, doctor, medic
 // fee (calculated based on medication fee, exam fee)
 
 async function getData(recordID, doctorID) {
-  console.log('Get inpatient Treatment data');
   try {
     const response = await fetch('/outpatientExaminationDoc', {
       method: 'POST',
@@ -56,12 +50,11 @@ async function getData(recordID, doctorID) {
     });
     if(response.ok){
       const data = await response.json();
-      console.log('server respone');
       console.log(data);
       if (data) {
         // maper function
         return data.outpatient_examination.map(record => 
-          createData(record[0], record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8])
+          createData(record[0], record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9])
           );
       }
       return null;
@@ -103,8 +96,6 @@ export default function TableOutPatientExamine({recordExamineShow}) {
   
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(+event.target.value);
-    console.log(+event.target.value);
-    console.log(event.target.value);
     setPage(0);
   }
 
@@ -143,15 +134,14 @@ export default function TableOutPatientExamine({recordExamineShow}) {
   function pdfRowData(pdfRows) {
     const selectedRows = pdfRows.filter((row) => isSelected(row.examID));
     const concatenatedRows = selectedRows.map((row) => {
-      const { examID, result, examDate, nextExam, diagnosis, doctor, medications, dosage ,totalFee } = row;
-      return [examID, result, examDate, nextExam, diagnosis, doctor, medications, dosage ,totalFee];
+      const { examID, result, examDate, nextExam, diagnosis, doctor, medications,dosage , medicationFee, fee, totalFee } = row;
+      return [examID, result, examDate, nextExam, diagnosis, doctor, medications,dosage , medicationFee, fee, totalFee];
     });
     return concatenatedRows;
   }
 
   useEffect(() => {
     getData(recordExamineShow, doctorID).then((data) => {
-      console.log('parse data');
       console.log(data);
       if(data === null){
         setRows([]);
@@ -160,11 +150,12 @@ export default function TableOutPatientExamine({recordExamineShow}) {
       }
     });
   }, []);
+  
 
   return (
     <Box mt={5} mb={3}>
       <Typography variant='h4' mb={2}>Examine table</Typography>
-      <TableContainer component={Paper} style={{ background: 'var(--m-3-sys-light-surface, #FFF8F6)' }}>
+      <TableContainer component={Paper} style={{ background: 'var(--m-3-sys-light-surface, #FFF8F6)', maxHeight:'700px' }}>
         <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
@@ -175,6 +166,7 @@ export default function TableOutPatientExamine({recordExamineShow}) {
               <TableCell align="right" style={{ fontWeight: "bold" }}>Diagnosis&nbsp;</TableCell>
               <TableCell align="right" style={{ fontWeight: "bold" }}>Doctor&nbsp;</TableCell>
               <TableCell align="right" style={{ fontWeight: "bold" }}>Medication&nbsp;</TableCell>
+              <TableCell align="right" style={{ fontWeight: "bold" }}>Fee&nbsp;</TableCell>
               <TableCell align="right" style={{ fontWeight: "bold" }}>Total fee&nbsp;</TableCell>
               <TableCell align="right" style={{ fontWeight: "bold" }}>
               <Checkbox
@@ -207,7 +199,7 @@ export default function TableOutPatientExamine({recordExamineShow}) {
                     <TableCell align="right">{row.nextExam}</TableCell>
                     <TableCell align="right">{row.diagnosis}</TableCell>
                     <TableCell align="right">{row.doctor}</TableCell>
-                    <TableCell align="right">{row.medications + ' x ' + row.dosage}</TableCell>
+                    <TableCell align="right">{row.medications + ' x ' + row.dosage + ': ' + row.medicationFee + ' $'}</TableCell>
                     {/* <TableCell align="right">
                     {row.medications.map((medication, index) => {
                       return (
@@ -218,6 +210,7 @@ export default function TableOutPatientExamine({recordExamineShow}) {
                       );
                     })}
                     </TableCell> */}
+                    <TableCell align="right">{row.fee} $</TableCell>
                     <TableCell align="right">{row.totalFee} $</TableCell>
                     <TableCell align="center" sx={{ width: 24, height: 24 }}>
                       <Checkbox
@@ -256,8 +249,24 @@ export default function TableOutPatientExamine({recordExamineShow}) {
         {title:  'Next exam'},
         {title:  'Diagnosis'},
         {title: 'Doctor'},
-        {title: 'Medications'},
-        {title: 'Total fee'},
+        {
+          title: 'Medications',
+          style: {
+            width: 38
+          }
+        },
+        {
+          title: 'Fee',
+          style: {
+            width: 13
+          }
+          },
+        {
+          title: 'Total fee',
+          style: {
+            width: 13
+          }
+        },
         // { examID, result, examDate, nextExam, diagnosis, doctor, medications, dosage , totalFee}
         ],pdfRowData(rows))}> export pdf </Button>}
     </Box>

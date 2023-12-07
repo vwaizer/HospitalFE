@@ -30,6 +30,7 @@ export default function TableContent({rows, ...rest}) {
   const {setPatientInfo} = usePatient();
 
   function onClickFunc(row){
+    console.log(row)
     setPatientInfo({
       patientID: row.id,
       patientFName: row.fName,
@@ -49,8 +50,6 @@ export default function TableContent({rows, ...rest}) {
   
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(+event.target.value);
-    console.log(+event.target.value);
-    console.log(event.target.value);
     setPage(0);
   }
   

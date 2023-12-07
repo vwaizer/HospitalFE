@@ -113,7 +113,7 @@ oracledb.createPool({
       const { recordID } = req.body;
       const connection = await pool.getConnection();
       const result = await connection.execute(
-        `select tm.treatment_id, tm.result, TO_CHAR(tm.start_date, 'dd-mm-yyyy'), TO_CHAR(tm.end_date, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage,u.dosage*m.current_price
+        `select tm.treatment_id, tm.result, TO_CHAR(tm.start_date, 'dd-mm-yyyy'), TO_CHAR(tm.end_date, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage,u.dosage*m.current_price, fee
                 from treatment tm, treat t, employee d, treat_use_med u, medication m
                 where tm.treatment_id = t.treatment_id and d.unique_code = t.doctor_id and tm.record_id = :recordID 
                 and u.treatment_id = tm.treatment_id and m.unique_code = u.med_id`,
@@ -164,7 +164,7 @@ oracledb.createPool({
       const { recordID } = req.body;
       const connection = await pool.getConnection();
       const result = await connection.execute(
-        `select ex.exam_id, ex.result, TO_CHAR(ex.examinate_date, 'dd-mm-yyyy'), TO_CHAR(ex.next_ex, 'dd-mm-yyyy'), ex.diagnosis, d.fname || ' ' || d.lname, m.name, u.dosage ,u.dosage*m.current_price
+        `select ex.exam_id, ex.result, TO_CHAR(ex.examinate_date, 'dd-mm-yyyy'), TO_CHAR(ex.next_ex, 'dd-mm-yyyy'), ex.diagnosis, d.fname || ' ' || d.lname, m.name, u.dosage ,u.dosage*m.current_price, fee
                 from examination ex, examine e, employee d, exam_use_med u, medication m
                 where ex.exam_id = e.exam_id and d.unique_code = e.doctor_id and ex.record_id = :recordID
                 and u.exam_id = ex.exam_id and m.unique_code = u.med_id`,
@@ -227,7 +227,7 @@ oracledb.createPool({
             const { patientID, doctorID } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
-                `select r.record_id, r.ip_id, r.admission_date, r.discharge_date, r.diagnosis, r.sick_room, n.fname || ' ' || n.lname as nurse_name, r.total_fee
+                `select r.record_id, r.ip_id, TO_CHAR(r.admission_date, 'dd-mm-yyyy'), r.discharge_date, r.diagnosis, r.sick_room, n.fname || ' ' || n.lname as nurse_name, r.total_fee
                 from inpatient_record r, inpatient i, employee n, employee d, treat t, treatment tm
                 where i.id = r.ip_id and i.id = :patientID and n.unique_code = i.nurse_uc
                 and d.unique_code = t.doctor_id and t.ip_id = r.ip_id
@@ -284,7 +284,7 @@ oracledb.createPool({
             const { recordID, doctorID } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
-                `select tm.treatment_id, tm.result, TO_CHAR(tm.start_date, 'dd-mm-yyyy'), TO_CHAR(tm.end_date, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage*m.current_price
+                `select tm.treatment_id, tm.result, TO_CHAR(tm.start_date, 'dd-mm-yyyy'), TO_CHAR(tm.end_date, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage, u.dosage*m.current_price, fee
                 from treatment tm, treat t, employee d, treat_use_med u, medication m
                 where tm.treatment_id = t.treatment_id and d.unique_code = t.doctor_id and tm.record_id = :recordID 
                 and u.treatment_id = tm.treatment_id and m.unique_code = u.med_id
@@ -311,7 +311,7 @@ oracledb.createPool({
             const { recordID, doctorID } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
-                `select ex.exam_id, ex.result, TO_CHAR(ex.examinate_date, 'dd-mm-yyyy'), TO_CHAR(ex.next_ex, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage*m.current_price
+                `select ex.exam_id, ex.result, TO_CHAR(ex.examinate_date, 'dd-mm-yyyy'), TO_CHAR(ex.next_ex, 'dd-mm-yyyy'), ex.diagnosis, d.fname || ' ' || d.lname, m.name, u.dosage, u.dosage*m.current_price, fee
                 from examination ex, examine e, employee d, exam_use_med u, medication m
                 where ex.exam_id = e.exam_id and d.unique_code = e.doctor_id and ex.record_id = :recordID
                 and u.exam_id = ex.exam_id and m.unique_code = u.med_id

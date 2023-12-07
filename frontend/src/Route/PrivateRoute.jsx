@@ -4,6 +4,5 @@ import { useAuth } from '../context/AuthContext';
 
 export default function PrivateRoute ( {children} ) {
   const { authenticated } = useAuth();
-  console.log(authenticated);
   return authenticated ? children : <Navigate to={`/login`} />; // push user back to login page if not logged in
 };

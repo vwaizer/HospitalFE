@@ -25,7 +25,6 @@ const drawerWidth = 248;
 
 function handleLogOut(){
   localStorage.removeItem('username');
-  console.log('log out')
 }
 
 function ListItemLink({ text, icon, to, ...other }) {

@@ -41,7 +41,6 @@ async function getData(patientID) {
   // const response = await fetch('http://localhost:5000/api/inpatient');
   // const data = await response.json();
   // return data;
-  console.log('Get inpatient record');
   try {
     const response = await fetch('/inpatientRecord', {
       method: 'POST',
@@ -52,8 +51,6 @@ async function getData(patientID) {
     });
     if(response.ok){
       const data = await response.json();
-      console.log('server respone');
-      console.log(data);
       if (data && data.inpatient_record && data.inpatient_record.length > 0) {
         // maper function
         return data.inpatient_record.map(record => 
@@ -93,8 +90,6 @@ export default function TableInPatient({showTreatment, setShowTreatment, setReco
 
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(+event.target.value);
-    console.log(+event.target.value);
-    console.log(event.target.value);
     setPage(0);
   }
 

@@ -26,7 +26,6 @@ async function getData (doctorName) {
     });
     if(response.ok){
       const data = await response.json();
-      console.log('server respone', data);
       if (data) {
         // maper function
         return data.patientData.map(record => {
@@ -34,8 +33,8 @@ async function getData (doctorName) {
           {
             doctorID: record[0], 
             id: record[1],
-            ipCode: record[2] ? record[1] : 'N/A',
-            opCode: record[3] ? record[2] : 'N/A',
+            ipCode: record[2] ? record[2] : 'N/A',
+            opCode: record[3] ? record[3] : 'N/A',
             fName: record[4],
             lName: record[5],
             phoneNumber: record[6],
@@ -77,12 +76,8 @@ const SearchPage = () => {
     event.preventDefault();
     const formData = new FormData(event.target);
     // get the data of the form
-    console.log(formData.get("doctorID"));
-    console.log(formData.get("doctorName"));
-    console.log("search submit");
     const doctorName = formData.get("doctorName");
     const returneddata = await getData(doctorName);
-    console.log('the return data', returneddata);
     
     if(returneddata){
       setRows(returneddata);
