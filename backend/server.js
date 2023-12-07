@@ -10,9 +10,9 @@ app.use(bodyParser.json());
 const PORT = 3001;
 
 oracledb.createPool({
-  user: 'asm312',
-  password: 'vi312',
-  connectString: 'localhost:1521/XE',
+  user: 'TREERSPEAKING',
+  password: 'Clash123',
+  connectString: 'localhost:1521/ORCLPDB',
   multipleStatements: false
 }).then(pool => {
   app.listen(PORT, () => {
@@ -53,7 +53,7 @@ oracledb.createPool({
       const connection = await pool.getConnection();
       const result = await connection.execute(
         `
-        select distinct id, ip, op, fname, lname, phone_no, address, dob, gender   from
+        select distinct id, ip, op, fname, lname, phone_no, address, dob, gender from
         ( SELECT i.id, i.ipcode AS ip, 
         case when id in (select id from outpatient) then (select opcode from outpatient o where o.id = i.id) else null end as op, 
         i.fname, i.lname, i.phone_no, i.address, i.dob, i.gender
@@ -65,10 +65,10 @@ oracledb.createPool({
         FROM outpatient o )
         where id = :patientID OR (:patientName IS NOT NULL AND fname || ' ' || lname like '%' || :patientName || '%')
         `,
-        { patientID , patientName}
-    );
-    await connection.close();
-    console.log(result);
+        { patientID, patientName }
+      );
+      await connection.close();
+      console.log(result);
       if (result.rows.length > 0) {
         const patient = result
         console.log('Found patient', patient);
@@ -91,80 +91,80 @@ oracledb.createPool({
         `select r.record_id, r.ip_id, TO_CHAR(r.admission_date, 'dd-mm-yyyy'), TO_CHAR(r.discharge_date, 'dd-mm-yyyy'), r.diagnosis, r.sick_room, n.fname || ' ' || n.lname as nurse_name, r.total_fee 
                 from inpatient_record r, inpatient i, employee n
                 where i.id = r.ip_id and i.id = :patientID and n.unique_code = i.nurse_uc`,
-                {patientID}
-            );
-            await connection.close();
-            if (result.rows.length > 0){
-                const record = result.rows
-                console.log('Found record', record[0][0]);
-                res.json({ inpatient_record : record });
-            }
-            else{
-                console.error('Record not found', patientID); 
-                res.status(401).json({ success: false, message: 'Record not found'});
-            }
-        } catch (error){
-            console.error(error.message);
-            res.status(500).send('Server Error');
-        }
-    });
-    app.post('/inpatientTreatment', async (req, res) => {
-        try{
-            const { recordID } = req.body;
-            const connection = await pool.getConnection();
-            const result = await connection.execute(
-                `select tm.treatment_id, tm.result, TO_CHAR(tm.start_date, 'dd-mm-yyyy'), TO_CHAR(tm.end_date, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage*m.current_price
+        { patientID }
+      );
+      await connection.close();
+      if (result.rows.length > 0) {
+        const record = result.rows
+        console.log('Found record', record[0][0]);
+        res.json({ inpatient_record: record });
+      }
+      else {
+        console.error('Record not found', patientID);
+        res.status(401).json({ success: false, message: 'Record not found' });
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Server Error');
+    }
+  });
+  app.post('/inpatientTreatment', async (req, res) => {
+    try {
+      const { recordID } = req.body;
+      const connection = await pool.getConnection();
+      const result = await connection.execute(
+        `select tm.treatment_id, tm.result, TO_CHAR(tm.start_date, 'dd-mm-yyyy'), TO_CHAR(tm.end_date, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage,u.dosage*m.current_price
                 from treatment tm, treat t, employee d, treat_use_med u, medication m
                 where tm.treatment_id = t.treatment_id and d.unique_code = t.doctor_id and tm.record_id = :recordID 
                 and u.treatment_id = tm.treatment_id and m.unique_code = u.med_id`,
-                {recordID}
-            );
-            await connection.close();
-            if (result.rows.length > 0){
-                const treatments = result.rows
-                console.log('Found treatment', treatments[0][0]);
-                res.json({ inpatient_treatment : treatments });
-            }
-            else{
-                console.error('Treatment not found', recordID); 
-                res.status(401).json({ success: false, message: 'Treatment not found'});
-            }
-        } catch (error){
-            console.error(error.message);
-            res.status(500).send('Server Error');
-        }
-    });
-    app.post('/outpatientRecord', async (req, res) => {
-        try{
-            const { patientID } = req.body;
-            const connection = await pool.getConnection();
-            const result = await connection.execute(
-                `select r.record_id, r.op_id, r.total_fee 
+        { recordID }
+      );
+      await connection.close();
+      if (result.rows.length > 0) {
+        const treatments = result.rows
+        console.log('Found treatment', treatments);
+        res.json({ inpatient_treatment: treatments });
+      }
+      else {
+        console.error('Treatment not found', recordID);
+        res.status(401).json({ success: false, message: 'Treatment not found' });
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Server Error');
+    }
+  });
+  app.post('/outpatientRecord', async (req, res) => {
+    try {
+      const { patientID } = req.body;
+      const connection = await pool.getConnection();
+      const result = await connection.execute(
+        `select r.record_id, r.op_id, r.total_fee 
                 from outpatient_record r, outpatient o
                 where o.id = r.op_id and o.id = :patientID`,
-                {patientID}
-            );
-            await connection.close();
-            if (result.rows.length > 0){
-                const record = result.rows
-                console.log('Found record', record[0]);
-                res.json({ outpatient_record : record });
-            }
-            else{
-                console.error('Record not found', patientID); 
-                res.status(401).json({ success: false, message: 'Record not found'});
-            }
-        } catch (error){
-            console.error(error.message);
-            res.status(500).send('Server Error');
-        }
-    });
-    app.post('/outpatientExamination', async (req, res) => {
-        try{
-            const { recordID } = req.body;
-            const connection = await pool.getConnection();
-            const result = await connection.execute(
-                `select ex.exam_id, ex.result, TO_CHAR(ex.examinate_date, 'dd-mm-yyyy'), TO_CHAR(ex.next_ex, 'dd-mm-yyyy'), ex.diagnosis, d.fname || ' ' || d.lname, m.name, u.dosage*m.current_price
+        { patientID }
+      );
+      await connection.close();
+      if (result.rows.length > 0) {
+        const record = result.rows
+        console.log('Found record', record[0]);
+        res.json({ outpatient_record: record });
+      }
+      else {
+        console.error('Record not found', patientID);
+        res.status(401).json({ success: false, message: 'Record not found' });
+      }
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Server Error');
+    }
+  });
+  app.post('/outpatientExamination', async (req, res) => {
+    try {
+      const { recordID } = req.body;
+      const connection = await pool.getConnection();
+      const result = await connection.execute(
+        `select ex.exam_id, ex.result, TO_CHAR(ex.examinate_date, 'dd-mm-yyyy'), TO_CHAR(ex.next_ex, 'dd-mm-yyyy'), ex.diagnosis, d.fname || ' ' || d.lname, m.name, u.dosage ,u.dosage*m.current_price
                 from examination ex, examine e, employee d, exam_use_med u, medication m
                 where ex.exam_id = e.exam_id and d.unique_code = e.doctor_id and ex.record_id = :recordID
                 and u.exam_id = ex.exam_id and m.unique_code = u.med_id`,
@@ -191,16 +191,16 @@ oracledb.createPool({
             const { doctorName } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
-                `SELECT DISTINCT id, ip, op, fname, lname, phone_no, address FROM
+                `SELECT DISTINCT  doctor_id, id, ip, op, fname, lname, phone_no, address, dob, gender  FROM
                 (SELECT i.id, i.ipcode AS ip, 
                 CASE WHEN id IN (SELECT id FROM outpatient) THEN (SELECT opcode FROM outpatient o WHERE o.id = i.id) ELSE NULL END AS op, 
-                i.fname, i.lname, i.phone_no, i.address
+                i.fname, i.lname, i.phone_no, i.address, i.dob, i.gender, d.unique_code as doctor_id
                 FROM inpatient i, employee d, treat t
                 WHERE t.doctor_id = d.unique_code AND t.ip_id = i.id AND d.fname || ' ' || d.lname LIKE '%'||:doctorName||'%'
                 UNION ALL
                 SELECT o.id, 
                 CASE WHEN id IN (SELECT id FROM inpatient) THEN (SELECT ipcode FROM inpatient i WHERE i.id = o.id) ELSE NULL END AS ip, 
-                o.opcode AS op, o.fname, o.lname, o.phone_no, o.address
+                o.opcode AS op, o.fname, o.lname, o.phone_no, o.address, o.dob, o.gender, d.unique_code as doctor_id
                 FROM outpatient o , employee d, examine e
                 WHERE e.doctor_id = d.unique_code AND e.op_id = o.id AND d.fname || ' ' || d.lname LIKE '%'||:doctorName||'%')`,
                 {doctorName}
@@ -232,7 +232,7 @@ oracledb.createPool({
                 where i.id = r.ip_id and i.id = :patientID and n.unique_code = i.nurse_uc
                 and d.unique_code = t.doctor_id and t.ip_id = r.ip_id
                 and tm.treatment_id = t.treatment_id and tm.record_id = r.record_id
-                and d.unique_code = doctorID`,
+                and d.unique_code = :doctorID`,
                 {patientID, doctorID}
             );
             await connection.close();
@@ -260,7 +260,7 @@ oracledb.createPool({
                 where o.id = r.op_id and o.id = :patientID and
                 e.doctor_id = d.unique_code and e.op_id = o.id
                 and ex.exam_id = e.exam_id and ex.record_id = r.record_id
-                and d.unique_code = doctorID`,
+                and d.unique_code = :doctorID`,
                 {patientID, doctorID}
             );
             await connection.close();
@@ -288,7 +288,7 @@ oracledb.createPool({
                 from treatment tm, treat t, employee d, treat_use_med u, medication m
                 where tm.treatment_id = t.treatment_id and d.unique_code = t.doctor_id and tm.record_id = :recordID 
                 and u.treatment_id = tm.treatment_id and m.unique_code = u.med_id
-                and d.unique_code = doctorID`,
+                and d.unique_code = :doctorID`,
                 {recordID, doctorID}
             );
             await connection.close();
@@ -315,7 +315,7 @@ oracledb.createPool({
                 from examination ex, examine e, employee d, exam_use_med u, medication m
                 where ex.exam_id = e.exam_id and d.unique_code = e.doctor_id and ex.record_id = :recordID
                 and u.exam_id = ex.exam_id and m.unique_code = u.med_id
-                and d.unique_code = doctorID`,
+                and d.unique_code = :doctorID`,
                 {recordID, doctorID}
             );
             await connection.close();
@@ -338,17 +338,18 @@ oracledb.createPool({
         try{
             const { id, ipcode, opcode, fname, lname, sex, address, dob, phone_no, nurse_uc } = req.body;
             const connection = await pool.getConnection();
+            const options = { autoCommit: true };
             let result1, result2;
             if(ipcode){
                 result1 = await connection.execute(
                     `INSERT INTO INPATIENT VALUES (:id, :ipcode, :fname, :lname, :sex, :address, TO_DATE(:dob, 'YYYY-MM-DD'), to_number(:phone_no), :nurse_uc)`,
-                    { id, ipcode, fname, lname, sex, address, dob, phone_no, nurse_uc}
+                    { id, ipcode, fname, lname, sex, address, dob, phone_no, nurse_uc}, options
                 );
             }
             if(opcode){
                 result2 = await connection.execute(
                     `INSERT INTO OUTPATIENT VALUES (:id, :opcode, :fname, :lname, :sex, :address, TO_DATE(:dob, 'YYYY-MM-DD'), to_number(:phone_no))`,
-                    {id, opcode, fname, lname, sex, address, dob, phone_no}
+                    {id, opcode, fname, lname, sex, address, dob, phone_no}, options
                 );
             }
             await connection.close();
