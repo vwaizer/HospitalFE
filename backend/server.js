@@ -10,9 +10,10 @@ app.use(bodyParser.json());
 const PORT = 3001;
 
 oracledb.createPool({
-  user: 'TREERSPEAKING',
-  password: 'Clash123',
-  connectString: 'localhost:1521/ORCLPDB'
+  user: 'asm312',
+  password: 'vi312',
+  connectString: 'localhost:1521/XE',
+  multipleStatements: false
 }).then(pool => {
   app.listen(PORT, () => {
     console.log('Server is running on port 3001');
@@ -21,6 +22,13 @@ oracledb.createPool({
     try {
       const { username, password } = req.body;
       const connection = await pool.getConnection();
+      const lettersNumbersAndSpacePattern = /^[A-Za-z0-9\s]+$/;
+
+      if (!username.match(lettersNumbersAndSpacePattern)) {
+        console.error('Only letters, numbers, and spaces are allowed, no special characters!');
+        return res.status(402).json({ err: 'Only letters, numbers, and spaces are allowed, no special characters!' });
+      }
+
       const result = await connection.execute(
         'SELECT * FROM USERS WHERE USERNAME = :username AND PASSWORD =:password',
         { username, password }
@@ -183,15 +191,18 @@ oracledb.createPool({
             const { doctorName } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
-                `SELECT  D.UNIQUE_CODE, O.ID, O.FNAME, O.LNAME, O.PHONE_NO, O.address
-                FROM OUTPATIENT O, EXAMINE E, EMPLOYEE D
-                WHERE D.FNAME || ' ' || D.LNAME LIKE '%'||:doctorName||'%'
-                AND E.DOCTOR_ID = D.UNIQUE_CODE AND E.OP_ID = O.ID
-                UNION
-                SELECT D.UNIQUE_CODE, I.ID, I.FNAME, I.LNAME, I.PHONE_NO, I.address
-                FROM INPATIENT I, TREAT T, EMPLOYEE D
-                WHERE D.FNAME || ' ' || D.LNAME LIKE '%'||:doctorName||'%'
-                AND T.DOCTOR_ID = D.UNIQUE_CODE AND T.IP_ID = I.ID`,
+                `SELECT DISTINCT id, ip, op, fname, lname, phone_no, address FROM
+                (SELECT i.id, i.ipcode AS ip, 
+                CASE WHEN id IN (SELECT id FROM outpatient) THEN (SELECT opcode FROM outpatient o WHERE o.id = i.id) ELSE NULL END AS op, 
+                i.fname, i.lname, i.phone_no, i.address
+                FROM inpatient i, employee d, treat t
+                WHERE t.doctor_id = d.unique_code AND t.ip_id = i.id AND d.fname || ' ' || d.lname LIKE :doctorName'
+                UNION ALL
+                SELECT o.id, 
+                CASE WHEN id IN (SELECT id FROM inpatient) THEN (SELECT ipcode FROM inpatient i WHERE i.id = o.id) ELSE NULL END AS ip, 
+                o.opcode AS op, o.fname, o.lname, o.phone_no, o.address
+                FROM outpatient o , employee d, examine e
+                WHERE e.doctor_id = d.unique_code AND e.op_id = o.id AND d.fname || ' ' || d.lname LIKE :doctorName)`,
                 {doctorName}
             );
             await connection.close();
