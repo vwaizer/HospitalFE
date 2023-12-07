@@ -19,6 +19,7 @@ import { PatientInfoProvider } from '../context/PatientInfoContext'
 import { DoctorSearchProvider } from '../context/DoctorSearchContext'
 import { PatientSearchProvider } from '../context/PatientSearchContext'
 import { AuthProvider } from '../context/AuthContext'
+import DoctorReportPage from '../Pages/DoctorReportPage/DoctorReportPage'
 import PrivateRoute from '../Route/PrivateRoute'
 
 const router = createBrowserRouter(
@@ -27,10 +28,11 @@ const router = createBrowserRouter(
       <Route path="/" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path='/Home' element={<PrivateRoute children={<Root />}/>}>
-        <Route index element={<SearchPage />} />
+        <Route index element={<PrivateRoute children={<SearchPage />}/>} />
         <Route path="/Home/SearchPage" element={<PrivateRoute children={<SearchPage />}/>}></Route>
-        <Route path="/Home/Report" element={<ReportPage />}></Route>
-        <Route path="/Home/SearchDoctor" element={<SearchDoctorPage />}></Route>
+        <Route path="/Home/Report" element={<PrivateRoute children={<ReportPage />}/>}></Route>
+        <Route path="/Home/SearchDoctor" element={<PrivateRoute children={<SearchDoctorPage />}/>}></Route>
+        <Route path="/Home/SearchDoctorReport" element={<PrivateRoute children={<DoctorReportPage />}/>}></Route>
       </Route>
     </Route>
   )

@@ -33,19 +33,19 @@ function createData(recordID, opCode, totalFee) {
 // Total fee 
 // OTHER THAN OP CODE ALL OTHER DATA WILL BE FROM OUTPATIENT RECORD TABLE (OUT PATIENT RECORD TABLE IS NOT PRESENT IN THE REALTIONAL SCHEMA DUE JUST CREATED)
 
-async function getData(patientID) {
+async function getData(patientID, doctorID) {
   // Get data function
   // const response = await fetch('http://localhost:5000/api/inpatient');
   // const data = await response.json();
   // return data;
   console.log('Get outpatient record');
   try {
-    const response = await fetch('/outpatientRecord', {
+    const response = await fetch('/outpatientRecordDoc', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ patientID }),
+      body: JSON.stringify({ patientID, doctorID }),
     });
     if(response.ok){
       const data = await response.json();
@@ -78,8 +78,9 @@ export default function TableOutPatient({showExamine, setShowExamine, setRecordE
     // Add more rows as needed
   ]);
   const [showDetail,setShowDetail]= [showExamine, setShowExamine];
-  const { patientInfo } = usePatient();
-  const { patientID } = patientInfo;
+  const { patientID, doctorID  } = usePatient().patientInfo;
+
+
     const onClickFunc=(recordID)=>{
         setShowDetail(!showDetail);
         setRecordExamineShow(recordID);
@@ -99,7 +100,9 @@ export default function TableOutPatient({showExamine, setShowExamine, setRecordE
   }
   
   useEffect(() => {
-    getData(patientID).then((data) => {
+    getData(patientID, doctorID).then((data) => {
+      console.log('parsed data');
+      console.log(data);
       if(data === null){
         setRows([]);
       }else{

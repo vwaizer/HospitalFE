@@ -63,7 +63,7 @@ const Report = () => {
 
   return (
     <>
-      <Typography variant="h2" p={`32px`}>Report</Typography>
+      <Typography variant="h2" p={`32px`}>Patient report</Typography>
       <Container maxWidth={false} sx={{ width: '85%' }} >
         <Stack mb={5} direction="column" spacing={10}>
           <Stack direction="row" spacing={2} justifyContent="space-between">

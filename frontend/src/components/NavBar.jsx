@@ -24,7 +24,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 const drawerWidth = 248;
 
 function handleLogOut(){
-  localStorage.removeItem('token');
+  localStorage.removeItem('username');
   console.log('log out')
 }
 
@@ -95,7 +95,7 @@ function ResponsiveDrawer(props) {
       <Divider />
       <List sx={{display: 'flex', flexDirection:'column',flexGrow: '1'}}>
         <ListItemLink text="SearchPage" icon={<SearchIcon />} to="/Home/SearchPage" />
-        <ListItemLink text="Report" icon={<DescriptionIcon />} to="/Home/Report" />
+        {/* <ListItemLink text="Report" icon={<DescriptionIcon />} to="/Home/Report" /> */}
         <ListItemLink text="SearchDoctorPage" icon={<SearchIcon />} to="/Home/SearchDoctor" />
       </List>
         <ListItemLogOut text="Log Out" icon={<LogoutIcon />} to={"/LogIn"} onClick={handleLogOut}/>

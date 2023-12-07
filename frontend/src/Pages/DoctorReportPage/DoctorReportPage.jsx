@@ -33,7 +33,6 @@ const Report = () => {
   const [showOutPatientRecord, setShowOutPatientRecord] = useState(false);
   const [showTreatment, setShowTreatment] = useState(false);
   const [showExamine, setShowExamine] = useState(false);
-  const { patientInfo } = usePatient();
   const { 
     patientID,
     patientFName,
@@ -44,7 +43,7 @@ const Report = () => {
     patientBirthDate,
     patientIpCode,
     patientOpCode,
-   } = patientInfo;
+   } = usePatient().patientInfo;
   function toggleInpatientRecord() {
     setShowInpatientRecord(!showInpatientRecord);
     setShowTreatment(false);
@@ -63,7 +62,7 @@ const Report = () => {
 
   return (
     <>
-      <Typography variant="h2" p={`32px`}>Doctor search</Typography>
+      <Typography variant="h2" p={`32px`}>Doctor report</Typography>
       <Container maxWidth={false} sx={{ width: '85%' }} >
         <Stack mb={5} direction="column" spacing={10}>
           <Stack direction="row" spacing={2} justifyContent="space-between">

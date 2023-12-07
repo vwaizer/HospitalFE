@@ -232,6 +232,7 @@ const AddForm = ({ openAdd, setOpenAdd, addSubmit }) => {
                     Nurse ID
                   </Typography>
                   <TextField
+                    label={'Nurse ID'}
                     id="nurseID"
                     name="nurseID"
                     autoComplete="nurseID"

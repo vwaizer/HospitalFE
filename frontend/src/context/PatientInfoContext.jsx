@@ -17,6 +17,7 @@ export function PatientInfoProvider({ children }) {
         patientBirthDate: '',
         patientIpCode: '',
         patientOpCode: '',
+        doctorID: '',
     });
 
     const value = {

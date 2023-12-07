@@ -19,8 +19,8 @@ import {
   Button,
 } from "@mui/material";
 import Detail from './InPatientDetail'
-
-
+import {pdfGenerate} from './PdfPrinter';
+import { usePatient } from "../../context/PatientInfoContext.jsx";
 // function totalFeeCalculation(treatementFee ,medications) {
 //   let total = treatementFee;
 //   medications.forEach((medication) => {
@@ -29,8 +29,8 @@ import Detail from './InPatientDetail'
 //   return total;
 // }
 
-function createData(treatmentID, result, startDate, endDate, doctor, medications, totalFee) {
-  return { treatmentID, result, startDate, endDate, doctor, medications, totalFee };
+function createData(treatmentID, result, startDate, endDate, doctor, medications,dosage , totalFee) {
+  return { treatmentID, result, startDate, endDate, doctor, medications,dosage , totalFee };
 }
 
 
@@ -43,15 +43,15 @@ function createData(treatmentID, result, startDate, endDate, doctor, medications
 // Medication (use TREATMENT table)
 // fee (TREATMENT table)
 
-async function getData(recordID) {
+async function getData(recordID, doctorID) {
   console.log('Get inpatient Treatment data');
   try {
-    const response = await fetch('/inpatientTreatment', {
+    const response = await fetch('/inpatientTreatmentDoc', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ recordID }),
+      body: JSON.stringify({ recordID, doctorID }),
     });
     if(response.ok){
       const data = await response.json();
@@ -85,6 +85,7 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
     // createData(4, "Negative", "2022-01-04", "2022-01-16", "Dr. Brown", [{ name: 'medicine D', quantity: 1, priceperbox: 250}], 250 ),
     // createData(5, "Positive", "2022-01-05", "2022-01-18", "Dr. Davis", [{ name: 'medicine E', quantity: 1, priceperbox: 300}], 300 )
   ]);
+  const { doctorID  } = usePatient().patientInfo;
   const [showDetail, setShowDetail] = useState(true);
   const [detail, setDetail] = useState({});
   const [selected, setSelected] = useState([]);
@@ -139,9 +140,17 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
     setSelected(newSelected);
   };
 
+  function pdfRowData(pdfRows) {
+    const selectedRows = pdfRows.filter((row) => isSelected(row.treatmentID));
+    const concatenatedRows = selectedRows.map((row) => {
+      const { treatmentID, result, startDate, endDate, doctor, medications, dosage, totalFee } = row;
+      return [treatmentID, result, startDate, endDate, doctor, medications, dosage, totalFee];
+    });
+    return concatenatedRows;
+  }
   // This code run once on mount.
   useEffect(() => {
-    getData(recordTreatmentShow).then((data) => {
+    getData(recordTreatmentShow, doctorID).then((data) => {
       console.log('parse data');
       console.log(data);
       if (data === null) {
@@ -195,16 +204,17 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
                     <TableCell align="right">{row.startDate}</TableCell>
                     <TableCell align="right">{row.endDate}</TableCell>
                     <TableCell align="right">{row.doctor}</TableCell>
-                    <TableCell align="right">
-                    {/* {row.medications.map((medication,index) => {
+                    <TableCell align="right">{row.medications + ' x ' + row.dosage}</TableCell>
+                    {/* <TableCell align="right">
+                    {row.medications.map((medication,index) => {
                       return (
                         <div key={index}>
                           {medication.name} * {medication.quantity}: {medication.priceperbox * medication.quantity} $
                           <br/>
                         </div>
                       );
-                    })} */}
-                    </TableCell>
+                    })}
+                    </TableCell> */}
                     <TableCell align="right">{row.totalFee} $</TableCell>
                     <TableCell
                       align="center"
@@ -232,12 +242,22 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
 
 
       </TableContainer>
-      {
+      {/* {
         rows.map(row => {
           if (isSelected(row.treatmentID)) {
             return <Detail key={row.treatmentID} data={row} />
           }})
-      }
+      } */}
+      
+      { rows!= [] && <Button onClick={() => pdfGenerate([
+        {title: 'TreatmentID'},
+        {title: 'Result'},
+        {title: 'Start date'},
+        {title:  'End date'},
+        {title:  'Doctor'},
+        {title: 'Medications'},
+        {title: 'Total fee'}
+        ],pdfRowData(rows))}> export pdf </Button>}
     </Box>
 
   );

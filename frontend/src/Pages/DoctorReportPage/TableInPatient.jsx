@@ -36,19 +36,19 @@ function createData(recordID, ipCode, dateOfAddmission, dischargeDate, diagnosis
 // Total fee
 // OTHER THAN IP CODE ALL OTHER DATA WILL BE FROM INPATIENT RECORD TABLE
 
-async function getData(patientID) {
+async function getData(patientID, doctorID) {
   // Get data function
   // const response = await fetch('http://localhost:5000/api/inpatient');
   // const data = await response.json();
   // return data;
   console.log('Get inpatient record');
   try {
-    const response = await fetch('/inpatientRecord', {
+    const response = await fetch('/inpatientRecordDoc', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ patientID }),
+      body: JSON.stringify({ patientID, doctorID }),
     });
     if(response.ok){
       const data = await response.json();
@@ -78,7 +78,7 @@ export default function TableInPatient({showTreatment, setShowTreatment, setReco
   const [rows, setRows] = useState([]);
   const [showDetail,setShowDetail]= [showTreatment, setShowTreatment]; 
   const { patientInfo } = usePatient();
-  const { patientID } = patientInfo;
+  const { patientID, doctorID  } = patientInfo;
 
   const onClickFunc=(recordID)=>{
     setShowDetail(!showDetail);
@@ -100,7 +100,7 @@ export default function TableInPatient({showTreatment, setShowTreatment, setReco
 
   // This function will run once when the component is mounted
   useEffect(() => {
-    getData(patientID).then((data) => {
+    getData(patientID, doctorID).then((data) => {
       if(data === null){
         setRows([]);
       }else{

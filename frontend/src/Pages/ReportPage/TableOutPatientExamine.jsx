@@ -19,6 +19,7 @@ import {
   Checkbox
 } from "@mui/material";
 import Detail from './OutPaitientDetail';
+import {pdfGenerate} from './PdfPrinter';
 
 function totalFeeCalculation(treatementFee ,medications) {
   let total = treatementFee;
@@ -28,8 +29,8 @@ function totalFeeCalculation(treatementFee ,medications) {
   return total;
 }
 
-function createData(examID, result, examDate, nextExam, diagnosis, doctor, medications, totalFee) {
-  return { examID, result, examDate, nextExam, diagnosis, doctor, medications, totalFee};
+function createData(examID, result, examDate, nextExam, diagnosis, doctor, medications, dosage, totalFee) {
+  return { examID, result, examDate, nextExam, diagnosis, doctor, medications,dosage , totalFee};
 }
 
 
@@ -60,7 +61,7 @@ async function getData(recordID) {
       if (data) {
         // maper function
         return data.outpatient_examination.map(record => 
-          createData(record[0], record[1], record[2], record[3], record[4], record[5], record[6], record[7])
+          createData(record[0], record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8])
           );
       }
       return null;
@@ -138,6 +139,15 @@ export default function TableOutPatientExamine({recordExamineShow}) {
     setSelected(newSelected);
   };
 
+  function pdfRowData(pdfRows) {
+    const selectedRows = pdfRows.filter((row) => isSelected(row.examID));
+    const concatenatedRows = selectedRows.map((row) => {
+      const { examID, result, examDate, nextExam, diagnosis, doctor, medications, dosage ,totalFee } = row;
+      return [examID, result, examDate, nextExam, diagnosis, doctor, medications, dosage ,totalFee];
+    });
+    return concatenatedRows;
+  }
+
   useEffect(() => {
     getData(recordExamineShow).then((data) => {
       console.log('parse data');
@@ -196,16 +206,17 @@ export default function TableOutPatientExamine({recordExamineShow}) {
                     <TableCell align="right">{row.nextExam}</TableCell>
                     <TableCell align="right">{row.diagnosis}</TableCell>
                     <TableCell align="right">{row.doctor}</TableCell>
-                    <TableCell align="right">
-                    {/* {row.medications.map((medication, index) => {
+                    <TableCell align="right">{row.medications + ' x ' + row.dosage}</TableCell>
+                    {/* <TableCell align="right">
+                    {row.medications.map((medication, index) => {
                       return (
                         <div key={index}>
                           {medication.name} * {medication.quantity}: {medication.priceperbox * medication.quantity} $
                           <br/>
                         </div>
                       );
-                    })} */}
-                    </TableCell>
+                    })}
+                    </TableCell> */}
                     <TableCell align="right">{row.totalFee} $</TableCell>
                     <TableCell align="center" sx={{ width: 24, height: 24 }}>
                       <Checkbox
@@ -231,12 +242,23 @@ export default function TableOutPatientExamine({recordExamineShow}) {
 
 
       </TableContainer>
-      {
+      {/* {
         rows.map(row => {
           if (isSelected(row.examID)) {
             return <Detail key={row.examID} data={row} />
           }})
-      }
+      } */}
+      { rows!= [] && <Button onClick={() => pdfGenerate([
+        {title: 'ExamineID'},
+        {title: 'Result'},
+        {title: 'Exam date'},
+        {title:  'Next exam'},
+        {title:  'Diagnosis'},
+        {title: 'Doctor'},
+        {title: 'Medications'},
+        {title: 'Total fee'},
+        // { examID, result, examDate, nextExam, diagnosis, doctor, medications, dosage , totalFee}
+        ],pdfRowData(rows))}> export pdf </Button>}
     </Box>
 
   );

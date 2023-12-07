@@ -11,8 +11,8 @@ const Container = styled.div`
   padding: 32px;
 `;
 
-function createData(doctorID, id, fName, lName, phoneNumeber, address) {
-  return { doctorID ,id, lName, fName, phoneNumeber, address };
+function createData(doctorID, id, fName, lName, phoneNumber, address) {
+  return { doctorID ,id, lName, fName, phoneNumber, address };
 }
 
 async function getData (doctorName) {
@@ -26,12 +26,24 @@ async function getData (doctorName) {
     });
     if(response.ok){
       const data = await response.json();
-      console.log(data);
+      console.log('server respone', data);
       if (data) {
         // maper function
         return data.patientData.map(record => {
           return(
-          createData(record[0], record[1], record [2], record[3], record[4], record[5]));
+          {
+            doctorID: record[0], 
+            id: record[1],
+            ipCode: record[2] ? record[1] : 'N/A',
+            opCode: record[3] ? record[2] : 'N/A',
+            fName: record[4],
+            lName: record[5],
+            phoneNumber: record[6],
+            address: record[7],
+            dob: new Date(record[8]).toLocaleDateString(),
+            gender: record[9] === 'F' ? 'female' : 'male',
+          }
+            );
         });
       }
       return [];

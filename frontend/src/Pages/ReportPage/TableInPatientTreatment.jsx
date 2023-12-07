@@ -19,7 +19,7 @@ import {
   Button,
 } from "@mui/material";
 import Detail from './InPatientDetail'
-
+import {pdfGenerate} from './PdfPrinter';
 
 // function totalFeeCalculation(treatementFee ,medications) {
 //   let total = treatementFee;
@@ -29,8 +29,8 @@ import Detail from './InPatientDetail'
 //   return total;
 // }
 
-function createData(treatmentID, result, startDate, endDate, doctor, medications, totalFee) {
-  return { treatmentID, result, startDate, endDate, doctor, medications, totalFee };
+function createData(treatmentID, result, startDate, endDate, doctor, medications,dosage , totalFee) {
+  return { treatmentID, result, startDate, endDate, doctor, medications,dosage , totalFee };
 }
 
 
@@ -139,6 +139,14 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
     setSelected(newSelected);
   };
 
+  function pdfRowData(pdfRows) {
+    const selectedRows = pdfRows.filter((row) => isSelected(row.treatmentID));
+    const concatenatedRows = selectedRows.map((row) => {
+      const { treatmentID, result, startDate, endDate, doctor, medications, dosage, totalFee } = row;
+      return [treatmentID, result, startDate, endDate, doctor, medications, dosage, totalFee];
+    });
+    return concatenatedRows;
+  }
   // This code run once on mount.
   useEffect(() => {
     getData(recordTreatmentShow).then((data) => {
@@ -195,16 +203,17 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
                     <TableCell align="right">{row.startDate}</TableCell>
                     <TableCell align="right">{row.endDate}</TableCell>
                     <TableCell align="right">{row.doctor}</TableCell>
-                    <TableCell align="right">
-                    {/* {row.medications.map((medication,index) => {
+                    <TableCell align="right">{row.medications + ' x ' + row.dosage}</TableCell>
+                    {/* <TableCell align="right">
+                    {row.medications.map((medication,index) => {
                       return (
                         <div key={index}>
                           {medication.name} * {medication.quantity}: {medication.priceperbox * medication.quantity} $
                           <br/>
                         </div>
                       );
-                    })} */}
-                    </TableCell>
+                    })}
+                    </TableCell> */}
                     <TableCell align="right">{row.totalFee} $</TableCell>
                     <TableCell
                       align="center"
@@ -232,12 +241,22 @@ export default function TableInPatientTreatment({recordTreatmentShow}) {
 
 
       </TableContainer>
-      {
+      {/* {
         rows.map(row => {
           if (isSelected(row.treatmentID)) {
             return <Detail key={row.treatmentID} data={row} />
           }})
-      }
+      } */}
+      
+      { rows!= [] && <Button onClick={() => pdfGenerate([
+        {title: 'TreatmentID'},
+        {title: 'Result'},
+        {title: 'Start date'},
+        {title:  'End date'},
+        {title:  'Doctor'},
+        {title: 'Medications'},
+        {title: 'Total fee'}
+        ],pdfRowData(rows))}> export pdf </Button>}
     </Box>
 
   );

@@ -27,9 +27,22 @@ export default function TableContent({rows, ...rest}) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
-  function onClickFunc(){
-  }
+  const {setPatientInfo} = usePatient();
 
+  function onClickFunc(row){
+    setPatientInfo({
+      patientID: row.id,
+      patientFName: row.fName,
+      patientLName: row.lName,
+      patientPhoneNumber: row.phoneNumber,
+      patientAddress: row.address,
+      patientGender: row.gender,
+      patientBirthDate: row.dob,
+      patientIpCode: row.ipCode,
+      patientOpCode: row.opCode,
+      doctorID: row.doctorID,
+    });
+  }
   function handleChangePage(event, newPage) {
     setPage(newPage);
   }
@@ -69,10 +82,10 @@ export default function TableContent({rows, ...rest}) {
               <TableCell>{row.id}</TableCell>
               <TableCell align="right">{row.lName}</TableCell>
               <TableCell align="right">{row.fName}</TableCell>
-              <TableCell align="right">{row.phoneNumeber}</TableCell>
+              <TableCell align="right">{row.phoneNumber}</TableCell>
               <TableCell align="right">{row.address}</TableCell>
               <TableCell align="center" sx={{width: 24, height: 24}}>
-              <Link to="/Home/Report" onClick={() => onClickFunc()}> 
+              <Link to="/Home/SearchDoctorReport" onClick={() => onClickFunc(row)}> 
                 <ArrowRightIcon/>
               </Link>
               </TableCell>

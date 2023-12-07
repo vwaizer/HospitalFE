@@ -13,13 +13,13 @@ const Detail = ({data}) => {
         <Typography>Diagnosis {data.diagnosis}</Typography>
         <Typography>Doctor: {data.doctor}</Typography>
         <Typography>Medication used: </Typography>
-        {data.medications.map((medication, index) => {
+        {/* {data.medications.map((medication, index) => {
           return (
             <Typography key={index}>
               - {medication.name} x {medication.quantity} : {medication.priceperbox * medication.quantity} $
             </Typography>
           );
-        })}
+        })} */}
         <Typography>Fee: {data.fee} $</Typography>
         <Typography>Total fee: {data.totalFee} $</Typography>
       </Box>

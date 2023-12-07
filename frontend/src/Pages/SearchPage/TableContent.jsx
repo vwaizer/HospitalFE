@@ -29,7 +29,6 @@ export default function TableContent({rows, ...rest}) {
   const {setPatientInfo} = usePatient();
 
   function onClickFunc(row){
-    console.log(row);
     setPatientInfo({
       patientID: row.id,
       patientFName: row.fName,
