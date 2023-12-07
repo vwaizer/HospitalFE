@@ -196,13 +196,13 @@ oracledb.createPool({
                 CASE WHEN id IN (SELECT id FROM outpatient) THEN (SELECT opcode FROM outpatient o WHERE o.id = i.id) ELSE NULL END AS op, 
                 i.fname, i.lname, i.phone_no, i.address
                 FROM inpatient i, employee d, treat t
-                WHERE t.doctor_id = d.unique_code AND t.ip_id = i.id AND d.fname || ' ' || d.lname LIKE :doctorName'
+                WHERE t.doctor_id = d.unique_code AND t.ip_id = i.id AND d.fname || ' ' || d.lname LIKE '%'||:doctorName||'%'
                 UNION ALL
                 SELECT o.id, 
                 CASE WHEN id IN (SELECT id FROM inpatient) THEN (SELECT ipcode FROM inpatient i WHERE i.id = o.id) ELSE NULL END AS ip, 
                 o.opcode AS op, o.fname, o.lname, o.phone_no, o.address
                 FROM outpatient o , employee d, examine e
-                WHERE e.doctor_id = d.unique_code AND e.op_id = o.id AND d.fname || ' ' || d.lname LIKE :doctorName)`,
+                WHERE e.doctor_id = d.unique_code AND e.op_id = o.id AND d.fname || ' ' || d.lname LIKE '%'||:doctorName||'%')`,
                 {doctorName}
             );
             await connection.close();
@@ -224,7 +224,7 @@ oracledb.createPool({
     //SEARCH RECORDS GIVEN DOCTOR NAME, PATIENT_ID
     app.post('/inpatientRecordDoc', async (req, res) => {
         try{
-            const { patientID, doctorName } = req.body;
+            const { patientID, doctorID } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
                 `select r.record_id, r.ip_id, r.admission_date, r.discharge_date, r.diagnosis, r.sick_room, n.fname || ' ' || n.lname as nurse_name, r.total_fee
@@ -232,8 +232,8 @@ oracledb.createPool({
                 where i.id = r.ip_id and i.id = :patientID and n.unique_code = i.nurse_uc
                 and d.unique_code = t.doctor_id and t.ip_id = r.ip_id
                 and tm.treatment_id = t.treatment_id and tm.record_id = r.record_id
-                and d.fname || ' ' || d.lname like :doctorName`,
-                {patientID, doctorName}
+                and d.unique_code = doctorID`,
+                {patientID, doctorID}
             );
             await connection.close();
             if (result.rows.length > 0){
@@ -242,7 +242,7 @@ oracledb.createPool({
                 res.json({ inpatient_record : record });
             }
             else{
-                console.error('Record not found', patientID, doctorName); 
+                console.error('Record not found', patientID, doctorID); 
                 res.status(401).json({ success: false, message: 'Record not found'});
             }
         } catch (error){
@@ -252,7 +252,7 @@ oracledb.createPool({
     });
     app.post('/outpatientRecordDoc', async (req, res) => {
         try{
-            const { patientID, doctorName } = req.body;
+            const { patientID, doctorID } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
                 `select r.record_id, r.op_id, r.total_fee, d.fname || ' ' || d.lname
@@ -260,17 +260,17 @@ oracledb.createPool({
                 where o.id = r.op_id and o.id = :patientID and
                 e.doctor_id = d.unique_code and e.op_id = o.id
                 and ex.exam_id = e.exam_id and ex.record_id = r.record_id
-                and d.fname || ' ' || d.lname like :doctorName`,
-                {patientD, doctorName}
+                and d.unique_code = doctorID`,
+                {patientID, doctorID}
             );
             await connection.close();
             if (result.rows.length > 0){
                 const record = result.rows
                 console.log('Found record', record[0][0]);
-                res.json({ inpatient_record : record });
+                res.json({ outpatient_record : record });
             }
             else{
-                console.error('Record not found', patientID, doctorName); 
+                console.error('Record not found', patientID, doctorID); 
                 res.status(401).json({ success: false, message: 'Record not found'});
             }
         } catch (error){
@@ -281,15 +281,15 @@ oracledb.createPool({
     //SEARCH TREATMENT/ EXAMINATION ON RECORD_ID, DOCTOR_NAME
     app.post('/inpatientTreatmentDoc', async (req, res) => {
         try{
-            const { recordID, doctorName } = req.body;
+            const { recordID, doctorID } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
                 `select tm.treatment_id, tm.result, TO_CHAR(tm.start_date, 'dd-mm-yyyy'), TO_CHAR(tm.end_date, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage*m.current_price
                 from treatment tm, treat t, employee d, treat_use_med u, medication m
                 where tm.treatment_id = t.treatment_id and d.unique_code = t.doctor_id and tm.record_id = :recordID 
                 and u.treatment_id = tm.treatment_id and m.unique_code = u.med_id
-                and d.fname || ' ' || d.lname like :doctorName`,
-                {recordID, doctorName}
+                and d.unique_code = doctorID`,
+                {recordID, doctorID}
             );
             await connection.close();
             if (result.rows.length > 0){
@@ -298,7 +298,7 @@ oracledb.createPool({
                 res.json({ inpatient_treatment : treatments });
             }
             else{
-                console.error('Treatment not found', recordID, doctorName); 
+                console.error('Treatment not found', recordID, doctorID); 
                 res.status(401).json({ success: false, message: 'Treatment not found'});
             }
         } catch (error){
@@ -308,15 +308,15 @@ oracledb.createPool({
     });
     app.post('/outpatientExaminationDoc', async (req, res) => {
         try{
-            const { recordID, doctorName } = req.body;
+            const { recordID, doctorID } = req.body;
             const connection = await pool.getConnection();
             const result = await connection.execute(
                 `select ex.exam_id, ex.result, TO_CHAR(ex.examinate_date, 'dd-mm-yyyy'), TO_CHAR(ex.next_ex, 'dd-mm-yyyy'), d.fname || ' ' || d.lname, m.name, u.dosage*m.current_price
                 from examination ex, examine e, employee d, exam_use_med u, medication m
                 where ex.exam_id = e.exam_id and d.unique_code = e.doctor_id and ex.record_id = :recordID
                 and u.exam_id = ex.exam_id and m.unique_code = u.med_id
-                and d.fname || ' ' || d.lname like :doctorName`,
-                {recordID, doctorName}
+                and d.unique_code = doctorID`,
+                {recordID, doctorID}
             );
             await connection.close();
             if (result.rows.length > 0){
@@ -325,7 +325,7 @@ oracledb.createPool({
                 res.json({ outpatient_examination : examinations });
             }
             else{
-                console.error('Examination not found', recordID, doctorName); 
+                console.error('Examination not found', recordID, doctorID); 
                 res.status(401).json({ success: false, message: 'Examination not found'});
             }
         } catch (error){
